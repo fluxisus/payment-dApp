@@ -1,10 +1,10 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
  
 @layer base {
   :root {
+    /* Light mode variables */
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
  
@@ -34,6 +34,55 @@
     --ring: 222.2 84% 4.9%;
  
     --radius: 0.5rem;
+
+    /* Custom crypto colors for light mode */
+    --crypto-background: 0 0% 100%;
+    --crypto-card: 0 0% 97%;
+    --crypto-accent: 220 75% 50%;
+    --crypto-accent-hover: 220 75% 45%;
+    --crypto-text: 222 14% 15%;
+    --crypto-text-secondary: 220 9% 46%;
+    --crypto-border: 220 13% 91%;
+  }
+ 
+  .dark {
+    /* Dark mode variables */
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+ 
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+ 
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+ 
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+ 
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+ 
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+ 
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+ 
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+ 
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+
+    /* Custom crypto colors for dark mode */
+    --crypto-background: 220 10% 5%;
+    --crypto-card: 220 5% 9%;
+    --crypto-accent: 220 75% 52%;
+    --crypto-accent-hover: 220 75% 47%;
+    --crypto-text: 220 5% 91%;
+    --crypto-text-secondary: 220 5% 65%;
+    --crypto-border: 220 5% 20%;
   }
 }
  
@@ -42,12 +91,12 @@
     @apply border-border;
   }
   body {
-    @apply bg-crypto-dark text-crypto-text antialiased;
+    @apply bg-background text-foreground antialiased;
   }
 }
 
 .glass-card {
-  @apply bg-crypto-card/80 backdrop-blur-lg border border-white/10 rounded-2xl;
+  @apply bg-crypto-card/80 backdrop-blur-lg border border-crypto-border rounded-2xl;
 }
 
 .button-primary {
@@ -57,7 +106,7 @@
 }
 
 .button-secondary {
-  @apply px-6 py-3 bg-crypto-card hover:bg-white/10 text-white rounded-xl 
+  @apply px-6 py-3 bg-crypto-card hover:bg-white/10 text-crypto-text rounded-xl 
          transition-all duration-200 font-medium flex items-center justify-center gap-2
          hover:scale-[1.02] active:scale-[0.98];
 }

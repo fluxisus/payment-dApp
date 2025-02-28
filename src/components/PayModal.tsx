@@ -1,4 +1,3 @@
-
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Camera, QrCode } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -14,8 +13,9 @@ const PayModal = ({ open, onOpenChange }: PayModalProps) => {
   const [showCamera, setShowCamera] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const [cameraReady, setCameraReady] = useState(false);
 
-  // Clean up camera stream when component unmounts or modal closes
+  // Clean up camera stream when component unmounts
   useEffect(() => {
     return () => {
       if (streamRef.current) {
@@ -25,39 +25,79 @@ const PayModal = ({ open, onOpenChange }: PayModalProps) => {
     };
   }, []);
 
+  // Clean up camera when modal closes
   useEffect(() => {
-    if (!open) {
+    if (!open && streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
       setShowCamera(false);
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach(track => track.stop());
-        streamRef.current = null;
-      }
+      setCameraReady(false);
     }
   }, [open]);
 
+  // This effect handles setting up the video element when showCamera changes
+  useEffect(() => {
+    if (showCamera && streamRef.current && videoRef.current) {
+      // Set srcObject in this effect to ensure it happens after state update
+      videoRef.current.srcObject = streamRef.current;
+      
+      // Add event listeners to handle video loading
+      const handleCanPlay = () => {
+        console.log("Video can play now");
+        setCameraReady(true);
+      };
+      
+      const handleError = (e: Event) => {
+        console.error("Video error:", e);
+        setCameraReady(false);
+      };
+      
+      videoRef.current.addEventListener('canplay', handleCanPlay);
+      videoRef.current.addEventListener('error', handleError);
+      
+      // Clean up event listeners
+      return () => {
+        if (videoRef.current) {
+          videoRef.current.removeEventListener('canplay', handleCanPlay);
+          videoRef.current.removeEventListener('error', handleError);
+        }
+      };
+    }
+  }, [showCamera, streamRef.current]);
+
   const handleScanClick = async () => {
     try {
+      // If camera is already on, turn it off
       if (showCamera && streamRef.current) {
-        // If camera is already on, turn it off
         streamRef.current.getTracks().forEach(track => track.stop());
         streamRef.current = null;
         setShowCamera(false);
+        setCameraReady(false);
         return;
       }
 
+      // Get available video devices
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const videoDevices = devices.filter(device => device.kind === 'videoinput');
+      console.log('Available video devices:', videoDevices);
+
+      // Simple camera request - don't set srcObject here
       const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: "environment" } 
+        video: true,
+        audio: false
       });
+      
+      // Store the stream reference
       streamRef.current = stream;
       
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-      }
-      
+      // Set state to show camera - the effect will handle setting srcObject
       setShowCamera(true);
+      
+      console.log('Camera stream obtained:', stream.getVideoTracks().map(t => t.label));
     } catch (error) {
+      console.error("Camera error:", error);
       toast({
-        title: "Camera Access Denied",
+        title: "Camera Access Error",
         description: "Please allow camera access to scan QR codes",
         variant: "destructive",
       });
@@ -92,7 +132,7 @@ const PayModal = ({ open, onOpenChange }: PayModalProps) => {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="glass-card border-white/10 sm:max-w-md">
+      <DialogContent className="glass-card border-crypto-border sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold text-center">
             Pay
@@ -105,8 +145,15 @@ const PayModal = ({ open, onOpenChange }: PayModalProps) => {
                 ref={videoRef} 
                 autoPlay 
                 playsInline 
+                muted
                 className="absolute inset-0 w-full h-full object-cover"
+                style={{ transform: 'scaleX(-1)' }} // Mirror the video for selfie view
               />
+              {!cameraReady && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/50 text-white">
+                  Loading camera...
+                </div>
+              )}
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <div className="w-3/5 h-3/5 relative">
                   {/* Top-left corner */}

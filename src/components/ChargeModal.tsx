@@ -1,4 +1,3 @@
-
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -34,7 +33,7 @@ const ChargeModal = ({ open, onOpenChange }: ChargeModalProps) => {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="glass-card border-white/10 sm:max-w-md">
+      <DialogContent className="glass-card border-crypto-border sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold text-center">
             Charge

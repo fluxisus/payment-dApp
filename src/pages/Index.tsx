@@ -1,4 +1,3 @@
-
 import { Header } from "@/components/Header";
 import PayModal from "@/components/PayModal";
 import ChargeModal from "@/components/ChargeModal";
@@ -30,24 +29,26 @@ const Index = () => {
       <Header />
       
       <main className="flex-1 flex flex-col gap-8 p-6 mt-24">
-        {/* Action Buttons */}
-        <div className="flex gap-8 justify-center animate-fade-in">
-          <button
-            onClick={() => setIsChargeModalOpen(true)}
-            className="w-32 h-32 rounded-full bg-purple-600 hover:bg-purple-700
-                     flex items-center justify-center text-lg font-medium
-                     transition-all duration-200 hover:scale-105 active:scale-95"
-          >
-            Charge
-          </button>
-          <button
-            onClick={() => setIsPayModalOpen(true)}
-            className="w-32 h-32 rounded-full bg-emerald-600 hover:bg-emerald-700
-                     flex items-center justify-center text-lg font-medium
-                     transition-all duration-200 hover:scale-105 active:scale-95"
-          >
-            Pay
-          </button>
+        {/* Action Buttons - Modified to align with balance container */}
+        <div className="glass-card p-6 max-w-2xl mx-auto w-full animate-fade-in">
+          <div className="grid grid-cols-2 gap-4">
+            <button
+              onClick={() => setIsChargeModalOpen(true)}
+              className="w-full py-6 rounded-xl bg-purple-600 hover:bg-purple-700
+                       flex items-center justify-center text-lg font-medium
+                       transition-all duration-200 hover:scale-[1.02] active:scale-95"
+            >
+              Charge
+            </button>
+            <button
+              onClick={() => setIsPayModalOpen(true)}
+              className="w-full py-6 rounded-xl bg-emerald-600 hover:bg-emerald-700
+                       flex items-center justify-center text-lg font-medium
+                       transition-all duration-200 hover:scale-[1.02] active:scale-95"
+            >
+              Pay
+            </button>
+          </div>
         </div>
 
         {/* Balances Section */}

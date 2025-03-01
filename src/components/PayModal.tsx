@@ -43,12 +43,10 @@ const PayModal = ({ open, onOpenChange }: PayModalProps) => {
       
       // Add event listeners to handle video loading
       const handleCanPlay = () => {
-        console.log("Video can play now");
         setCameraReady(true);
       };
       
       const handleError = (e: Event) => {
-        console.error("Video error:", e);
         setCameraReady(false);
       };
       

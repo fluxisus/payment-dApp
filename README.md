@@ -18,7 +18,7 @@ Changes made via Lovable will be committed automatically to this repo.
 
 If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+The project uses Bun as the package manager - [install Bun](https://bun.sh/docs/installation)
 
 Follow these steps:
 
@@ -29,10 +29,20 @@ git clone <YOUR_GIT_URL>
 # Step 2: Navigate to the project directory.
 cd <YOUR_PROJECT_NAME>
 
-# Step 3: Install the necessary dependencies.
-npm i
+# Step 3: Install the necessary dependencies using Bun.
+bun install
 
 # Step 4: Start the development server with auto-reloading and an instant preview.
+bun run dev
+```
+
+Alternatively, if you prefer using npm:
+
+```sh
+# Install dependencies with npm
+npm install
+
+# Start the development server
 npm run dev
 ```
 
@@ -52,13 +62,15 @@ npm run dev
 
 ## What technologies are used for this project?
 
-This project is built with .
+This project is built with:
 
 - Vite
 - TypeScript
 - React
 - shadcn-ui
 - Tailwind CSS
+- Wagmi (for Web3/wallet integration)
+- Bun (package manager)
 
 ## How can I deploy this project?
 

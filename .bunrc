@@ -1,0 +1,7 @@
+{
+  "install": {
+    "exact": false,
+    "production": false,
+    "optional": false
+  }
+} 

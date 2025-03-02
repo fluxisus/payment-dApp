@@ -110,3 +110,23 @@
          transition-all duration-200 font-medium flex items-center justify-center gap-2
          hover:scale-[1.02] active:scale-[0.98];
 }
+
+/* Custom styles for the OrderModal close button */
+.order-modal [data-radix-dialog-close] {
+  position: absolute !important;
+  right: 1.5rem !important;
+  top: 1.5rem !important;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+  width: 1.5rem;
+  height: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+}
+
+.order-modal [data-radix-dialog-close]:hover {
+  opacity: 1;
+  background-color: rgba(255, 255, 255, 0.1);
+}

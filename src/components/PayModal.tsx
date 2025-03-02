@@ -6,6 +6,7 @@ import { readQrToken, QrReadResponse } from "@/lib/api";
 import { extractPaymentInfo, parseNetworkToken } from "@/lib/utils";
 import { useWallet } from "@/hooks/use-wallet";
 import jsQR from "jsqr";
+import { ProceedToPaymentButton } from "@/components/ProceedToPaymentButton";
 
 interface PayModalProps {
   open: boolean;
@@ -261,7 +262,7 @@ const PayModal = ({ open, onOpenChange, onTokenDetected }: PayModalProps) => {
     }
   };
 
-  const handleConfirmPayment = async () => {
+  const handleProceedToPayment = async () => {
     if (!paymentInfo) return;
     
     // TODO: Implement actual payment processing
@@ -369,13 +370,10 @@ const PayModal = ({ open, onOpenChange, onTokenDetected }: PayModalProps) => {
                 </div>
               )}
               
-              <button
-                className="button-primary w-full mt-4"
-                disabled={isProcessing || networkMismatch || !isConnected}
-                onClick={handleConfirmPayment}
-              >
-                Confirm Payment
-              </button>
+              <ProceedToPaymentButton 
+                networkMismatch={networkMismatch} 
+                onClick={handleProceedToPayment} 
+              />
             </div>
           )}
           

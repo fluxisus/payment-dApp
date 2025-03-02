@@ -1,10 +1,11 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
-import { AlertCircle, X } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { AlertCircle, Loader2, ExternalLink } from "lucide-react";
 import { useState, useEffect } from "react";
 import { QrReadResponse } from "@/lib/api";
 import { extractPaymentInfo } from "@/lib/utils";
 import { useWallet } from "@/hooks/use-wallet";
-import { Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { ProceedToPaymentButton } from "@/components/ProceedToPaymentButton";
 
 interface OrderModalProps {
   open: boolean;
@@ -60,6 +61,11 @@ const OrderModal = ({ open, onOpenChange, paymentData, isLoading }: OrderModalPr
     }
   };
 
+  const handleProceedToPayment = () => {
+    // Proceed to payment logic will go here
+    console.log("Proceed to payment for:", paymentInfo?.id);
+  };
+
   // Get network name from network ID
   const getNetworkName = (networkId: number | null) => {
     if (!networkId) return "Unknown";
@@ -72,19 +78,29 @@ const OrderModal = ({ open, onOpenChange, paymentData, isLoading }: OrderModalPr
     }
   };
 
+  // Check if a string is a valid URL
+  const isValidUrl = (urlString: string): boolean => {
+    try {
+      const url = new URL(urlString);
+      return url.protocol === 'http:' || url.protocol === 'https:';
+    } catch (e) {
+      return false;
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="glass-card border-crypto-border sm:max-w-md max-h-[90vh] overflow-hidden flex flex-col">
+      <DialogContent className={cn(
+        "glass-card border-crypto-border sm:max-w-md overflow-visible",
+        "order-modal" // Custom class for targeting in CSS
+      )}>
         <DialogHeader className="flex flex-row items-center justify-between">
           <DialogTitle className="text-xl font-semibold">
             Order Details
           </DialogTitle>
-          <DialogClose className="w-6 h-6 rounded-full hover:bg-white/10 flex items-center justify-center">
-            <X className="w-4 h-4" />
-          </DialogClose>
         </DialogHeader>
         
-        <div className="flex-1 overflow-y-auto py-4 space-y-4">
+        <div className="py-4 space-y-4">
           {isLoading ? (
             <div className="flex flex-col items-center justify-center h-40 space-y-3">
               <Loader2 className="w-8 h-8 animate-spin text-crypto-primary" />
@@ -116,20 +132,34 @@ const OrderModal = ({ open, onOpenChange, paymentData, isLoading }: OrderModalPr
                     <>
                       <p className="font-medium">{paymentInfo.order.merchant.name}</p>
                       <p className="text-sm">{paymentInfo.order.merchant.description}</p>
-                      <p className="text-xs text-crypto-text-secondary">Tax ID: {paymentInfo.order.merchant.tax_id}</p>
+                      <p className="text-xs text-crypto-text-secondary">Tax id: {paymentInfo.order.merchant.tax_id}</p>
                     </>
                   )}
-                  <p className="text-xs text-crypto-text-secondary mt-2">
-                    From: {paymentData.data.payload.iss}
-                  </p>
+                  <div className="text-xs text-crypto-text-secondary mt-2">
+                    From: {
+                      isValidUrl(paymentData.data.payload.iss) ? (
+                        <a 
+                          href={paymentData.data.payload.iss} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-crypto-accent hover:text-crypto-accent-hover hover:underline inline-flex items-center"
+                        >
+                          {paymentData.data.payload.iss}
+                          <ExternalLink className="ml-1 w-3 h-3" />
+                        </a>
+                      ) : (
+                        paymentData.data.payload.iss
+                      )
+                    }
+                  </div>
                 </div>
               </div>
               
               {/* Order Information */}
               <div className="space-y-2">
-                <h3 className="font-medium text-lg">Order ID: {paymentInfo.id}</h3>
+                <h3 className="font-medium text-lg">Identifier: {paymentInfo.id}</h3>
                 
-                {/* Order Items */}
+                {/* Order Items - Only this section is scrollable */}
                 {paymentInfo.order?.items && paymentInfo.order.items.length > 0 && (
                   <div className="p-4 bg-white/5 rounded-xl space-y-3 max-h-60 overflow-y-auto">
                     {paymentInfo.order.items.map((item, index) => (
@@ -171,12 +201,10 @@ const OrderModal = ({ open, onOpenChange, paymentData, isLoading }: OrderModalPr
               </div>
               
               {/* Payment Button */}
-              <button
-                className="button-primary w-full mt-4"
-                disabled={networkMismatch}
-              >
-                Confirm Payment
-              </button>
+              <ProceedToPaymentButton 
+                networkMismatch={networkMismatch} 
+                onClick={handleProceedToPayment} 
+              />
             </>
           ) : (
             <div className="flex items-center justify-center h-40">

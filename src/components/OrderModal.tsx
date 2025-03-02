@@ -56,6 +56,15 @@ const OrderModal = ({ open, onOpenChange, paymentData, isLoading }: OrderModalPr
     args: [`0x${string}`, bigint];
   } | null>(null);
 
+  // Reset state when modal is opened
+  useEffect(() => {
+    if (open) {
+      // Reset payment state when modal opens
+      setPaymentInitiated(false);
+      setTransferArgs(null);
+    }
+  }, [open]);
+
   // Extract payment info when payment data changes
   useEffect(() => {
     if (paymentData) {
@@ -91,12 +100,17 @@ const OrderModal = ({ open, onOpenChange, paymentData, isLoading }: OrderModalPr
   };
 
   const handleSwitchNetwork = async () => {
-    if (!paymentInfo || !paymentInfo.networkId) return;
+    if (!paymentInfo || !paymentInfo.networkId || !switchNetwork) return;
     
     try {
       await switchNetwork(paymentInfo.networkId);
     } catch (error) {
       console.error("Error switching network:", error);
+      toast({
+        title: "Network Switch Failed",
+        description: "Failed to switch to the required network",
+        variant: "destructive",
+      });
     }
   };
 
@@ -192,9 +206,16 @@ const OrderModal = ({ open, onOpenChange, paymentData, isLoading }: OrderModalPr
     
     switch (networkId) {
       case 1: return "Ethereum";
+      case 56: return "BNB Smart Chain";
       case 137: return "Polygon";
-      case 56: return "BSC";
-      default: return "Unknown";
+      case 42161: return "Arbitrum";
+      case 10: return "Optimism";
+      case 43114: return "Avalanche";
+      case 8453: return "Base";
+      case 5: return "Goerli (Testnet)";
+      case 80001: return "Mumbai (Testnet)";
+      case 11155111: return "Sepolia (Testnet)";
+      default: return `Network ${networkId}`;
     }
   };
 

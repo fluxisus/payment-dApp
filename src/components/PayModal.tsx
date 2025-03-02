@@ -27,6 +27,34 @@ const PayModal = ({ open, onOpenChange, onTokenDetected }: PayModalProps) => {
   const [paymentData, setPaymentData] = useState<QrReadResponse | null>(null);
   const [paymentInfo, setPaymentInfo] = useState<ReturnType<typeof extractPaymentInfo> | null>(null);
   const [networkMismatch, setNetworkMismatch] = useState(false);
+  const [clipboardPermissionDenied, setClipboardPermissionDenied] = useState(false);
+
+  // Reset state when modal is opened
+  useEffect(() => {
+    if (open) {
+      // Reset clipboard permission state when modal opens
+      setClipboardPermissionDenied(false);
+      
+      // Reset processing state
+      setIsProcessing(false);
+      
+      // Ensure camera is off when modal opens
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+        streamRef.current = null;
+      }
+      
+      // Clear any scanning intervals
+      if (scanIntervalRef.current) {
+        clearInterval(scanIntervalRef.current);
+        scanIntervalRef.current = null;
+      }
+      
+      // Reset camera UI state
+      setShowCamera(false);
+      setCameraReady(false);
+    }
+  }, [open]);
 
   // Clean up camera stream when component unmounts
   useEffect(() => {
@@ -94,7 +122,7 @@ const PayModal = ({ open, onOpenChange, onTokenDetected }: PayModalProps) => {
         }
       };
     }
-  }, [showCamera, streamRef.current]);
+  }, [showCamera]);
 
   const startQrScanning = () => {
     if (!videoRef.current || !canvasRef.current || scanIntervalRef.current) return;
@@ -231,58 +259,81 @@ const PayModal = ({ open, onOpenChange, onTokenDetected }: PayModalProps) => {
   };
 
   const handlePasteClick = async () => {
+    // If clipboard permission was previously denied, show a more helpful message
+    if (clipboardPermissionDenied) {
+      toast({
+        title: "Clipboard Access Required",
+        description: "Please allow clipboard access in your browser settings and try again",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
+      // Request clipboard permission and read text
       const text = await navigator.clipboard.readText();
       console.log("Clipboard content:", text);
+      
+      if (!text) {
+        toast({
+          title: "Empty Clipboard",
+          description: "Your clipboard is empty or doesn't contain text",
+          variant: "destructive",
+        });
+        return;
+      }
       
       // Process the token from clipboard
       await processNaspipToken(text);
     } catch (error) {
       console.error("Clipboard error:", error);
+      
+      // Mark clipboard permission as denied for this session
+      setClipboardPermissionDenied(true);
+      
       toast({
         title: "Clipboard Access Denied",
-        description: "Please allow clipboard access to paste content",
+        description: "Please allow clipboard access to paste content. You may need to reload the page.",
         variant: "destructive",
       });
     }
   };
 
   const handleSwitchNetwork = async () => {
-    if (!paymentInfo || !paymentInfo.networkId) return;
-    
-    try {
-      await switchNetwork(paymentInfo.networkId);
-    } catch (error) {
-      console.error("Error switching network:", error);
-      toast({
-        title: "Network Switch Failed",
-        description: "Could not switch to the required network",
-        variant: "destructive"
-      });
+    if (paymentInfo?.networkId && switchNetwork) {
+      try {
+        await switchNetwork(paymentInfo.networkId);
+      } catch (error) {
+        console.error("Error switching network:", error);
+        toast({
+          title: "Network Switch Failed",
+          description: "Failed to switch to the required network",
+          variant: "destructive"
+        });
+      }
     }
   };
 
   const handleProceedToPayment = async () => {
-    if (!paymentInfo) return;
-    
-    // TODO: Implement actual payment processing
-    console.log("Processing payment:", paymentInfo);
-    
-    toast({
-      title: "Payment Initiated",
-      description: "Your payment is being processed",
-    });
+    console.log("Proceeding to payment for ID:", paymentInfo?.id);
+    // Payment logic will be implemented here
   };
 
-  // Get network name from network ID
   const getNetworkName = (networkId: number | null) => {
     if (!networkId) return "Unknown";
     
     switch (networkId) {
       case 1: return "Ethereum";
+      case 56: return "BNB Smart Chain";
       case 137: return "Polygon";
-      case 56: return "BSC";
-      default: return "Unknown";
+      case 42161: return "Arbitrum";
+      case 10: return "Optimism";
+      case 43114: return "Avalanche";
+      case 8453: return "Base";
+      case 5: return "Goerli (Testnet)";
+      case 80001: return "Mumbai (Testnet)";
+      case 11155111: return "Sepolia (Testnet)";
+      default: return `Network ${networkId}`;
     }
   };
 

@@ -33,11 +33,19 @@ export const Header = () => {
   const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [selectedNetwork, setSelectedNetwork] = useState<string>("1"); // Default to Ethereum
   const { isConnected, address, disconnectWallet, chainId, switchNetwork, chains } = useWallet();
   const { isDarkMode } = useTheme();
   
   // Current logo size - change this to use any of the predefined sizes
   const logoSize = LOGO_SIZES.large;
+
+  // Update selectedNetwork when chainId changes (after connection)
+  useEffect(() => {
+    if (chainId) {
+      setSelectedNetwork(chainId.toString());
+    }
+  }, [chainId]);
 
   // Check if screen is mobile size
   useEffect(() => {
@@ -60,13 +68,20 @@ export const Header = () => {
   };
 
   const handleNetworkChange = (value: string) => {
-    switchNetwork(parseInt(value));
+    // Store the selected network value
+    setSelectedNetwork(value);
+    
+    // If connected, also switch the network in the wallet
+    if (isConnected) {
+      switchNetwork(parseInt(value));
+    }
   };
 
-  // Get current network info
-  const currentNetwork = chainId && NETWORKS[chainId as keyof typeof NETWORKS] 
-    ? NETWORKS[chainId as keyof typeof NETWORKS] 
-    : { name: "Unknown Network", icon: "https://assets.belo.app/images/eth.png", shortName: "???" };
+  // Get current network info based on connection status
+  const networkId = isConnected ? chainId : parseInt(selectedNetwork);
+  const currentNetwork = networkId && NETWORKS[networkId as keyof typeof NETWORKS] 
+    ? NETWORKS[networkId as keyof typeof NETWORKS] 
+    : NETWORKS[1]; // Default to Ethereum if network not found
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 px-6 py-4 flex items-center justify-between bg-crypto-dark/50 backdrop-blur-lg border-b border-crypto-border">
@@ -79,45 +94,44 @@ export const Header = () => {
       </div>
       
       <div className="flex items-center gap-4">
-        {isConnected && (
-          <Select 
-            value={chainId?.toString() || "1"}
-            onValueChange={handleNetworkChange}
-          >
-            <SelectTrigger className={`bg-transparent border-crypto-border ${isMobile ? 'w-[60px]' : 'w-[140px]'}`}>
-              {isMobile ? (
+        {/* Network selector - always visible and enabled regardless of connection status */}
+        <Select 
+          value={isConnected ? (chainId?.toString() || "1") : selectedNetwork}
+          onValueChange={handleNetworkChange}
+        >
+          <SelectTrigger className={`bg-transparent border-crypto-border ${isMobile ? 'w-[60px]' : 'w-[140px]'}`}>
+            {isMobile ? (
+              <img 
+                src={currentNetwork.icon} 
+                alt={currentNetwork.name} 
+                className="w-5 h-5 rounded-full"
+              />
+            ) : (
+              <div className="flex items-center gap-2">
                 <img 
                   src={currentNetwork.icon} 
                   alt={currentNetwork.name} 
                   className="w-5 h-5 rounded-full"
                 />
-              ) : (
+                <span>{currentNetwork.name}</span>
+              </div>
+            )}
+          </SelectTrigger>
+          <SelectContent>
+            {chains.map((chain) => (
+              <SelectItem key={chain.id} value={chain.id.toString()}>
                 <div className="flex items-center gap-2">
                   <img 
-                    src={currentNetwork.icon} 
-                    alt={currentNetwork.name} 
+                    src={NETWORKS[chain.id as keyof typeof NETWORKS]?.icon || "https://assets.belo.app/images/eth.png"} 
+                    alt={chain.name} 
                     className="w-5 h-5 rounded-full"
                   />
-                  <span>{currentNetwork.name}</span>
+                  <span>{chain.name}</span>
                 </div>
-              )}
-            </SelectTrigger>
-            <SelectContent>
-              {chains.map((chain) => (
-                <SelectItem key={chain.id} value={chain.id.toString()}>
-                  <div className="flex items-center gap-2">
-                    <img 
-                      src={NETWORKS[chain.id as keyof typeof NETWORKS]?.icon || "https://assets.belo.app/images/eth.png"} 
-                      alt={chain.name} 
-                      className="w-5 h-5 rounded-full"
-                    />
-                    <span>{chain.name}</span>
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        )}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
 
         <Button
           variant="ghost"

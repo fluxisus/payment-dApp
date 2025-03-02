@@ -1,17 +1,24 @@
 import { Header } from "@/components/Header";
 import PayModal from "@/components/PayModal";
 import ChargeModal from "@/components/ChargeModal";
+import OrderModal from "@/components/OrderModal";
 import { useState } from "react";
 import { useWallet } from "@/hooks/use-wallet";
 import { useTokenBalance, TOKENS, TokenSymbol, isTokenSupportedOnNetwork } from "@/hooks/use-token-balance";
 import { useTokenTransactions } from "@/hooks/use-token-transactions";
 import { useChainId } from "wagmi";
+import { readQrToken, QrReadResponse } from "@/lib/api";
+import { useToast } from "@/hooks/use-toast";
 
 const Index = () => {
   const [isPayModalOpen, setIsPayModalOpen] = useState(false);
   const [isChargeModalOpen, setIsChargeModalOpen] = useState(false);
+  const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
+  const [isLoadingOrder, setIsLoadingOrder] = useState(false);
+  const [paymentData, setPaymentData] = useState<QrReadResponse | null>(null);
   const { isConnected } = useWallet();
   const chainId = useChainId();
+  const { toast } = useToast();
   
   // Fetch token balances using our custom hook
   const { balance: usdcBalance, isLoading: isLoadingUsdc, isSupported: isUsdcSupported } = useTokenBalance('USDC');
@@ -37,6 +44,63 @@ const Index = () => {
       isSupported: isUsdcSupported
     },
   ];
+
+  // Handle NASPIP token detection
+  const handleTokenDetected = async (token: string) => {
+    // Close Pay modal if open
+    setIsPayModalOpen(false);
+    
+    // Show loading state
+    setIsLoadingOrder(true);
+    setIsOrderModalOpen(true);
+    
+    try {
+      // Show processing toast
+      toast({
+        title: "Processing",
+        description: "Reading payment information...",
+      });
+
+      // Call the API to read the token
+      const response = await readQrToken(token);
+      
+      if (response) {
+        // Store the payment data
+        setPaymentData(response);
+        
+        // Show success toast
+        toast({
+          title: "Payment Information Read",
+          description: "Ready to process payment",
+          className: "bg-green-600 border-green-700"
+        });
+        
+        // Log the response to console
+        console.log("Payment data:", response);
+      }
+    } catch (error) {
+      console.error("Error processing NASPIP token:", error);
+      toast({
+        title: "Processing Error",
+        description: error instanceof Error ? error.message : "Failed to process payment code",
+        variant: "destructive"
+      });
+      
+      // Close Order modal on error
+      setIsOrderModalOpen(false);
+    } finally {
+      setIsLoadingOrder(false);
+    }
+  };
+
+  // Handle Order modal close
+  const handleOrderModalClose = (open: boolean) => {
+    if (!open) {
+      // Reset state when closing
+      setPaymentData(null);
+      setIsOrderModalOpen(false);
+    }
+  };
 
   // Get network name based on chainId
   const getNetworkName = () => {
@@ -67,12 +131,12 @@ const Index = () => {
       <Header />
       
       <main className="flex-1 flex flex-col gap-8 p-6 mt-24">
-        {/* Action Buttons - Modified to align with balance container */}
-        <div className="glass-card p-6 max-w-2xl mx-auto w-full animate-fade-in">
-          <div className="grid grid-cols-2 gap-4">
+        {/* Action Buttons - In a glass card container */}
+        <div className="glass-card p-6 max-w-2xl mx-auto w-full">
+          <div className="flex justify-center gap-4 w-full">
             <button
               onClick={() => setIsChargeModalOpen(true)}
-              className="w-full py-6 rounded-xl bg-purple-600 hover:bg-purple-700
+              className="w-full py-4 rounded-xl bg-purple-600 hover:bg-purple-700
                        flex items-center justify-center text-lg font-medium
                        transition-all duration-200 hover:scale-[1.02] active:scale-95"
             >
@@ -80,7 +144,7 @@ const Index = () => {
             </button>
             <button
               onClick={() => setIsPayModalOpen(true)}
-              className="w-full py-6 rounded-xl bg-emerald-600 hover:bg-emerald-700
+              className="w-full py-4 rounded-xl bg-green-600 hover:bg-green-700
                        flex items-center justify-center text-lg font-medium
                        transition-all duration-200 hover:scale-[1.02] active:scale-95"
             >
@@ -88,7 +152,7 @@ const Index = () => {
             </button>
           </div>
         </div>
-
+        
         {/* Balance Section */}
         <div className="glass-card p-6 max-w-2xl mx-auto w-full">
           <h2 className="text-xl font-semibold mb-4">Balance</h2>
@@ -172,8 +236,18 @@ const Index = () => {
         )}
       </main>
 
-      <PayModal open={isPayModalOpen} onOpenChange={setIsPayModalOpen} />
+      <PayModal 
+        open={isPayModalOpen} 
+        onOpenChange={setIsPayModalOpen} 
+        onTokenDetected={handleTokenDetected} 
+      />
       <ChargeModal open={isChargeModalOpen} onOpenChange={setIsChargeModalOpen} />
+      <OrderModal 
+        open={isOrderModalOpen} 
+        onOpenChange={handleOrderModalClose} 
+        paymentData={paymentData} 
+        isLoading={isLoadingOrder} 
+      />
     </div>
   );
 };

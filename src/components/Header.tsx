@@ -24,9 +24,8 @@ const LOGO_SIZES = {
 // Network configurations
 const NETWORKS = {
   1: { name: "Ethereum", icon: "https://assets.belo.app/images/eth.png", shortName: "ETH" },
-  11155111: { name: "Sepolia", icon: "https://assets.belo.app/images/eth.png", shortName: "SEP" },
-  137: { name: "Polygon", icon: "https://assets.belo.app/images/polygon.png", shortName: "MATIC" },
-  56: { name: "BNB Chain", icon: "https://assets.belo.app/images/blockchains/bsc.png", shortName: "BNB" },
+  137: { name: "Polygon", icon: "https://assets.belo.app/images/blockchains/polygon.png", shortName: "MATIC" },
+  56: { name: "BSC", icon: "https://assets.belo.app/images/blockchains/bsc.png", shortName: "BNB" },
 };
 
 export const Header = () => {
@@ -123,10 +122,10 @@ export const Header = () => {
                 <div className="flex items-center gap-2">
                   <img 
                     src={NETWORKS[chain.id as keyof typeof NETWORKS]?.icon || "https://assets.belo.app/images/eth.png"} 
-                    alt={chain.name} 
+                    alt={NETWORKS[chain.id as keyof typeof NETWORKS]?.name || chain.name} 
                     className="w-5 h-5 rounded-full"
                   />
-                  <span>{chain.name}</span>
+                  <span>{NETWORKS[chain.id as keyof typeof NETWORKS]?.name || chain.name}</span>
                 </div>
               </SelectItem>
             ))}

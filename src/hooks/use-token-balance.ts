@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useAccount, useReadContract } from "wagmi";
+import { useAccount, useReadContract, useChainId } from "wagmi";
 import { formatUnits } from "viem";
 
 // ERC20 ABI (minimal for balance checking)
@@ -20,43 +20,94 @@ const erc20ABI = [
   },
 ] as const;
 
-// Token information
+// Network IDs
+export const NETWORKS = {
+  ETHEREUM: 1,
+  POLYGON: 137,
+  BSC: 56,
+};
+
+// Token information with network-specific addresses
 export const TOKENS = {
   USDC: {
-    address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+    // Token metadata (same across networks)
     decimals: 6,
     symbol: "USDC",
     icon: "https://assets.belo.app/images/usdc.png",
+    // Network-specific addresses
+    addresses: {
+      [NETWORKS.ETHEREUM]: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+      [NETWORKS.POLYGON]: "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
+      [NETWORKS.BSC]: "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d",
+    },
   },
   USDT: {
-    address: "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+    // Token metadata (same across networks)
     decimals: 6,
     symbol: "USDT",
     icon: "https://assets.belo.app/images/usdt.png",
+    // Network-specific addresses
+    addresses: {
+      [NETWORKS.ETHEREUM]: "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+      [NETWORKS.POLYGON]: "0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
+      [NETWORKS.BSC]: "0x55d398326f99059fF775485246999027B3197955",
+    },
   },
 };
 
 export type TokenSymbol = keyof typeof TOKENS;
 
+// Helper function to check if a token is supported on the current network
+export function isTokenSupportedOnNetwork(
+  tokenSymbol: TokenSymbol,
+  chainId: number,
+): boolean {
+  return !!TOKENS[tokenSymbol].addresses[chainId];
+}
+
+// Helper function to get token address for the current network
+export function getTokenAddressForNetwork(
+  tokenSymbol: TokenSymbol,
+  chainId: number,
+): `0x${string}` | undefined {
+  const address = TOKENS[tokenSymbol].addresses[chainId];
+  return address ? (address as `0x${string}`) : undefined;
+}
+
 export function useTokenBalance(tokenSymbol: TokenSymbol) {
   const [formattedBalance, setFormattedBalance] = useState<string>("0");
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
+  const [isSupported, setIsSupported] = useState<boolean>(true);
 
   const { address, isConnected } = useAccount();
+  const chainId = useChainId();
   const token = TOKENS[tokenSymbol];
+  const tokenAddress = getTokenAddressForNetwork(tokenSymbol, chainId);
+
+  // Check if token is supported on current network
+  useEffect(() => {
+    setIsSupported(isTokenSupportedOnNetwork(tokenSymbol, chainId));
+  }, [tokenSymbol, chainId]);
 
   const { data: balance } = useReadContract({
-    address: token.address as `0x${string}`,
+    address: tokenAddress,
     abi: erc20ABI,
     functionName: "balanceOf",
     args: address ? [address] : undefined,
     query: {
-      enabled: isConnected && !!address,
+      enabled: isConnected && !!address && !!tokenAddress && isSupported,
     },
   });
 
   useEffect(() => {
+    // If token is not supported on this network
+    if (!isSupported) {
+      setFormattedBalance("Not available");
+      setIsLoading(false);
+      return;
+    }
+
     if (!isConnected || !balance) {
       setFormattedBalance("0.00");
       setIsLoading(false);
@@ -65,7 +116,7 @@ export function useTokenBalance(tokenSymbol: TokenSymbol) {
 
     try {
       // Format the balance with the correct number of decimals
-      const formatted = formatUnits(balance, token.decimals);
+      const formatted = formatUnits(balance as bigint, token.decimals);
 
       // Convert to number to limit to 2 decimal places
       const numValue = parseFloat(formatted);
@@ -83,7 +134,7 @@ export function useTokenBalance(tokenSymbol: TokenSymbol) {
       setError(err instanceof Error ? err : new Error(String(err)));
       setIsLoading(false);
     }
-  }, [balance, isConnected, token.decimals, tokenSymbol]);
+  }, [balance, isConnected, token.decimals, tokenSymbol, isSupported]);
 
-  return { balance: formattedBalance, isLoading, error };
+  return { balance: formattedBalance, isLoading, error, isSupported };
 }

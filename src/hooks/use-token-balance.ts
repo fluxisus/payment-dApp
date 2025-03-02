@@ -34,11 +34,15 @@ export const TOKENS = {
     decimals: 6,
     symbol: "USDC",
     icon: "https://assets.belo.app/images/usdc.png",
-    // Network-specific addresses
+    // Network-specific addresses and overrides
     addresses: {
       [NETWORKS.ETHEREUM]: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-      [NETWORKS.POLYGON]: "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
+      [NETWORKS.POLYGON]: "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
       [NETWORKS.BSC]: "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d",
+    },
+    // Network-specific decimal overrides (if needed)
+    networkDecimals: {
+      [NETWORKS.BSC]: 18, // Override if BSC reports different decimals
     },
   },
   USDT: {
@@ -51,6 +55,10 @@ export const TOKENS = {
       [NETWORKS.ETHEREUM]: "0xdAC17F958D2ee523a2206206994597C13D831ec7",
       [NETWORKS.POLYGON]: "0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
       [NETWORKS.BSC]: "0x55d398326f99059fF775485246999027B3197955",
+    },
+    // Network-specific decimal overrides (if needed)
+    networkDecimals: {
+      [NETWORKS.BSC]: 18, // Override if BSC reports different decimals
     },
   },
 };
@@ -85,6 +93,9 @@ export function useTokenBalance(tokenSymbol: TokenSymbol) {
   const token = TOKENS[tokenSymbol];
   const tokenAddress = getTokenAddressForNetwork(tokenSymbol, chainId);
 
+  // Get the correct decimals for the current network
+  const tokenDecimals = token.networkDecimals?.[chainId] || token.decimals;
+
   // Check if token is supported on current network
   useEffect(() => {
     setIsSupported(isTokenSupportedOnNetwork(tokenSymbol, chainId));
@@ -115,10 +126,10 @@ export function useTokenBalance(tokenSymbol: TokenSymbol) {
     }
 
     try {
-      // Format the balance with the correct number of decimals
-      const formatted = formatUnits(balance as bigint, token.decimals);
+      // Format the balance with the correct number of decimals for the current network
+      const formatted = formatUnits(balance as bigint, tokenDecimals);
 
-      // Convert to number to limit to 2 decimal places
+      // Convert to number and always format to exactly 2 decimal places
       const numValue = parseFloat(formatted);
       const twoDecimalValue = numValue.toFixed(2);
 
@@ -134,7 +145,7 @@ export function useTokenBalance(tokenSymbol: TokenSymbol) {
       setError(err instanceof Error ? err : new Error(String(err)));
       setIsLoading(false);
     }
-  }, [balance, isConnected, token.decimals, tokenSymbol, isSupported]);
+  }, [balance, isConnected, tokenDecimals, tokenSymbol, isSupported, chainId]);
 
   return { balance: formattedBalance, isLoading, error, isSupported };
 }

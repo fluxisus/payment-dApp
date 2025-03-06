@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export interface ProceedToPaymentButtonProps {
   networkMismatch: boolean;
@@ -6,6 +7,8 @@ export interface ProceedToPaymentButtonProps {
 }
 
 export const ProceedToPaymentButton = ({ networkMismatch, onClick }: ProceedToPaymentButtonProps) => {
+  const { t } = useLanguage();
+
   return (
     <button
       className={cn(
@@ -17,7 +20,7 @@ export const ProceedToPaymentButton = ({ networkMismatch, onClick }: ProceedToPa
       disabled={networkMismatch}
       onClick={networkMismatch ? undefined : onClick}
     >
-      Proceed to Payment
+      {t('proceed_to_payment')}
     </button>
   );
 }; 

@@ -7,6 +7,7 @@ import { extractPaymentInfo, parseNetworkToken } from "@/lib/utils";
 import { useWallet } from "@/hooks/use-wallet";
 import jsQR from "jsqr";
 import { ProceedToPaymentButton } from "@/components/ProceedToPaymentButton";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface PayModalProps {
   open: boolean;
@@ -16,6 +17,7 @@ interface PayModalProps {
 
 const PayModal = ({ open, onOpenChange, onTokenDetected }: PayModalProps) => {
   const { toast } = useToast();
+  const { t } = useLanguage();
   const { isConnected, chainId, switchNetwork } = useWallet();
   const [showCamera, setShowCamera] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -189,8 +191,8 @@ const PayModal = ({ open, onOpenChange, onTokenDetected }: PayModalProps) => {
     } catch (error) {
       console.error("Camera error:", error);
       toast({
-        title: "Camera Access Error",
-        description: "Please allow camera access to scan QR codes",
+        title: t('camera_access_error'),
+        description: t('allow_camera_access'),
         variant: "destructive",
       });
     }
@@ -202,8 +204,8 @@ const PayModal = ({ open, onOpenChange, onTokenDetected }: PayModalProps) => {
       // Check if the token starts with "naspip"
       if (!token.startsWith("naspip")) {
         toast({
-          title: "Invalid Code",
-          description: "The content is not a valid NASPIP payment code",
+          title: t('invalid_code'),
+          description: t('invalid_payment_code'),
           variant: "destructive"
         });
         setIsProcessing(false);
@@ -222,8 +224,8 @@ const PayModal = ({ open, onOpenChange, onTokenDetected }: PayModalProps) => {
     } catch (error) {
       console.error("Error processing NASPIP token:", error);
       toast({
-        title: "Processing Error",
-        description: error instanceof Error ? error.message : "Failed to process payment code",
+        title: t('processing_error'),
+        description: error instanceof Error ? error.message : t('failed_read_token'),
         variant: "destructive"
       });
       setIsProcessing(false);
@@ -233,6 +235,14 @@ const PayModal = ({ open, onOpenChange, onTokenDetected }: PayModalProps) => {
   const handlePasteClick = async () => {
     try {
       const text = await navigator.clipboard.readText();
+      if (!text) {
+        toast({
+          title: t('empty_clipboard'),
+          description: t('clipboard_empty_text'),
+          variant: "destructive",
+        });
+        return;
+      }
       console.log("Clipboard content:", text);
       
       // Process the token from clipboard
@@ -240,8 +250,8 @@ const PayModal = ({ open, onOpenChange, onTokenDetected }: PayModalProps) => {
     } catch (error) {
       console.error("Clipboard error:", error);
       toast({
-        title: "Clipboard Access Denied",
-        description: "Please allow clipboard access to paste content",
+        title: t('clipboard_access_denied'),
+        description: t('allow_clipboard_access'),
         variant: "destructive",
       });
     }
@@ -276,14 +286,12 @@ const PayModal = ({ open, onOpenChange, onTokenDetected }: PayModalProps) => {
 
   // Get network name from network ID
   const getNetworkName = (networkId: number | null) => {
-    if (!networkId) return "Unknown";
+    if (!networkId) return t('unknown_network');
     
-    switch (networkId) {
-      case 1: return "Ethereum";
-      case 137: return "Polygon";
-      case 56: return "BSC";
-      default: return "Unknown";
-    }
+    const networkKey = networkId === 1 ? 'ethereum' : 
+                      networkId === 137 ? 'polygon' : 
+                      networkId === 56 ? 'bsc' : 'unknown_network';
+    return t(networkKey);
   };
 
   return (
@@ -291,7 +299,7 @@ const PayModal = ({ open, onOpenChange, onTokenDetected }: PayModalProps) => {
       <DialogContent className="glass-card border-crypto-border sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold text-center">
-            Pay
+            {t('pay')}
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-4">
@@ -310,18 +318,15 @@ const PayModal = ({ open, onOpenChange, onTokenDetected }: PayModalProps) => {
               />
               {!cameraReady && (
                 <div className="absolute inset-0 flex items-center justify-center bg-black/50 text-white">
-                  Loading camera...
+                  {t('loading_camera')}
                 </div>
               )}
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <div className="w-3/5 h-3/5 relative">
-                  {/* Top-left corner */}
+                  {/* QR code scanning frame corners */}
                   <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-white/70 rounded-tl-lg" />
-                  {/* Top-right corner */}
                   <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-white/70 rounded-tr-lg" />
-                  {/* Bottom-left corner */}
                   <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-white/70 rounded-bl-lg" />
-                  {/* Bottom-right corner */}
                   <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-white/70 rounded-br-lg" />
                 </div>
               </div>
@@ -330,26 +335,26 @@ const PayModal = ({ open, onOpenChange, onTokenDetected }: PayModalProps) => {
           
           {paymentData && paymentInfo && (
             <div className="p-4 bg-white/5 rounded-xl space-y-4">
-              <h3 className="font-medium">Payment Details:</h3>
+              <h3 className="font-medium">{t('payment_details')}</h3>
               <div className="grid grid-cols-2 gap-2 text-sm">
-                <span className="text-crypto-text-secondary">ID:</span>
+                <span className="text-crypto-text-secondary">{t('id')}</span>
                 <span>{paymentInfo.id}</span>
                 
-                <span className="text-crypto-text-secondary">Amount:</span>
+                <span className="text-crypto-text-secondary">{t('amount')}</span>
                 <span>{paymentInfo.amount}</span>
                 
-                <span className="text-crypto-text-secondary">Network:</span>
+                <span className="text-crypto-text-secondary">{t('network')}</span>
                 <span>{getNetworkName(paymentInfo.networkId)}</span>
                 
-                <span className="text-crypto-text-secondary">Address:</span>
+                <span className="text-crypto-text-secondary">{t('address')}</span>
                 <span className="truncate">{paymentInfo.address}</span>
                 
                 {paymentInfo.order && (
                   <>
-                    <span className="text-crypto-text-secondary">Merchant:</span>
+                    <span className="text-crypto-text-secondary">{t('merchant')}</span>
                     <span>{paymentInfo.order.merchant.name}</span>
                     
-                    <span className="text-crypto-text-secondary">Total:</span>
+                    <span className="text-crypto-text-secondary">{t('total')}</span>
                     <span>{paymentInfo.order.totalAmount} {paymentInfo.order.coinCode}</span>
                   </>
                 )}
@@ -359,12 +364,12 @@ const PayModal = ({ open, onOpenChange, onTokenDetected }: PayModalProps) => {
                 <div className="p-3 bg-yellow-500/20 border border-yellow-500/50 rounded-lg text-sm flex items-start gap-2">
                   <AlertCircle className="w-4 h-4 text-yellow-500 mt-0.5 flex-shrink-0" />
                   <div>
-                    <p>Network mismatch. This payment requires {getNetworkName(paymentInfo.networkId)}.</p>
+                    <p>{t('network_mismatch', { network: getNetworkName(paymentInfo.networkId) })}</p>
                     <button 
                       onClick={handleSwitchNetwork}
                       className="text-yellow-400 hover:text-yellow-300 font-medium mt-1"
                     >
-                      Switch Network
+                      {t('switch_network')}
                     </button>
                   </div>
                 </div>
@@ -383,7 +388,7 @@ const PayModal = ({ open, onOpenChange, onTokenDetected }: PayModalProps) => {
             disabled={isProcessing}
           >
             <Camera className="w-5 h-5" />
-            {showCamera ? "Stop Camera" : "Scan"}
+            {showCamera ? t('stop_camera') : t('scan')}
           </button>
           
           <button
@@ -392,7 +397,7 @@ const PayModal = ({ open, onOpenChange, onTokenDetected }: PayModalProps) => {
             disabled={isProcessing}
           >
             <QrCode className="w-5 h-5" />
-            Paste
+            {t('paste')}
           </button>
         </div>
       </DialogContent>

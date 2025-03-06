@@ -2,6 +2,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface ChargeModalProps {
   open: boolean;
@@ -9,6 +10,7 @@ interface ChargeModalProps {
 }
 
 const ChargeModal = ({ open, onOpenChange }: ChargeModalProps) => {
+  const { t } = useLanguage();
   const [formData, setFormData] = useState({
     id: "",
     token: "USDT",
@@ -36,23 +38,23 @@ const ChargeModal = ({ open, onOpenChange }: ChargeModalProps) => {
       <DialogContent className="glass-card border-crypto-border sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold text-center">
-            Charge
+            {t('charge')}
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-6 py-4">
           <div className="space-y-2">
-            <Label htmlFor="id">ID</Label>
+            <Label htmlFor="id">{t('id')}</Label>
             <Input
               id="id"
               value={formData.id}
               onChange={e => setFormData(prev => ({ ...prev, id: e.target.value.slice(0, 128) }))}
               className="bg-white/5"
-              placeholder="Enter ID"
+              placeholder={t('enter_id')}
             />
           </div>
 
           <div className="space-y-2">
-            <Label>Token</Label>
+            <Label>{t('token')}</Label>
             <div className="flex gap-4 justify-center">
               {tokenOptions.map((token) => (
                 <button
@@ -79,7 +81,7 @@ const ChargeModal = ({ open, onOpenChange }: ChargeModalProps) => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="amount">Amount</Label>
+            <Label htmlFor="amount">{t('amount')}</Label>
             <Input
               id="amount"
               type="text"

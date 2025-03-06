@@ -5,6 +5,7 @@ import WalletModal from "./WalletModal";
 import SettingsModal from "./SettingsModal";
 import ProfileMenu from "./ProfileMenu";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { useWallet } from "@/hooks/use-wallet";
 import {
   Select,
@@ -35,6 +36,7 @@ export const Header = () => {
   const [selectedNetwork, setSelectedNetwork] = useState<string>("1"); // Default to Ethereum
   const { isConnected, address, disconnectWallet, chainId, switchNetwork, chains } = useWallet();
   const { isDarkMode } = useTheme();
+  const { t } = useLanguage();
   
   // Current logo size - change this to use any of the predefined sizes
   const logoSize = LOGO_SIZES.large;
@@ -82,6 +84,14 @@ export const Header = () => {
     ? NETWORKS[networkId as keyof typeof NETWORKS] 
     : NETWORKS[1]; // Default to Ethereum if network not found
 
+  // Get translated network name
+  const getNetworkName = (id: number) => {
+    const networkKey = id === 1 ? 'ethereum' : 
+                      id === 137 ? 'polygon' : 
+                      id === 56 ? 'bsc' : 'unknown_network';
+    return t(networkKey);
+  };
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 px-6 py-4 flex items-center justify-between bg-crypto-dark/50 backdrop-blur-lg border-b border-crypto-border">
       <div className="flex items-center gap-2">
@@ -102,17 +112,17 @@ export const Header = () => {
             {isMobile ? (
               <img 
                 src={currentNetwork.icon} 
-                alt={currentNetwork.name} 
+                alt={getNetworkName(parseInt(selectedNetwork))} 
                 className="w-5 h-5 rounded-full"
               />
             ) : (
               <div className="flex items-center gap-2">
                 <img 
                   src={currentNetwork.icon} 
-                  alt={currentNetwork.name} 
+                  alt={getNetworkName(parseInt(selectedNetwork))} 
                   className="w-5 h-5 rounded-full"
                 />
-                <span>{currentNetwork.name}</span>
+                <span>{getNetworkName(parseInt(selectedNetwork))}</span>
               </div>
             )}
           </SelectTrigger>
@@ -122,10 +132,10 @@ export const Header = () => {
                 <div className="flex items-center gap-2">
                   <img 
                     src={NETWORKS[chain.id as keyof typeof NETWORKS]?.icon || "https://assets.belo.app/images/eth.png"} 
-                    alt={NETWORKS[chain.id as keyof typeof NETWORKS]?.name || chain.name} 
+                    alt={getNetworkName(chain.id)} 
                     className="w-5 h-5 rounded-full"
                   />
-                  <span>{NETWORKS[chain.id as keyof typeof NETWORKS]?.name || chain.name}</span>
+                  <span>{getNetworkName(chain.id)}</span>
                 </div>
               </SelectItem>
             ))}
@@ -152,8 +162,8 @@ export const Header = () => {
             onClick={handleConnectWallet}
             className="button-primary"
           >
-            <span className="hidden sm:inline-block">Connect Wallet</span>
-            <span className="sm:hidden">Connect</span>
+            <span className="hidden sm:inline-block">{t('connect_wallet')}</span>
+            <span className="sm:hidden">{t('connect_wallet')}</span>
           </Button>
         )}
       </div>

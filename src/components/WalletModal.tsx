@@ -7,6 +7,7 @@ import {
 import { useState } from "react";
 import { AlertCircle } from "lucide-react";
 import { useWallet } from "@/hooks/use-wallet";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface WalletModalProps {
   open: boolean;
@@ -26,6 +27,7 @@ const WALLETS = [
 
 const WalletModal = ({ open, onOpenChange }: WalletModalProps) => {
   const { connectWallet, isConnecting } = useWallet();
+  const { t } = useLanguage();
   const [error, setError] = useState<string | null>(null);
 
   const handleConnect = async (walletName: string) => {
@@ -36,7 +38,7 @@ const WalletModal = ({ open, onOpenChange }: WalletModalProps) => {
         onOpenChange(false);
       } catch (error) {
         console.error("Failed to connect to wallet:", error);
-        setError("Failed to connect to wallet. Please try again.");
+        setError(t('wallet_connection_failed'));
       }
     } else {
       // For other wallets, just close the modal for now
@@ -50,7 +52,7 @@ const WalletModal = ({ open, onOpenChange }: WalletModalProps) => {
       <DialogContent className="glass-card border-crypto-border sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold text-center">
-            Connect Wallet
+            {t('connect_wallet')}
           </DialogTitle>
         </DialogHeader>
         <div className="grid gap-4 py-4">
@@ -81,7 +83,7 @@ const WalletModal = ({ open, onOpenChange }: WalletModalProps) => {
           
           {isConnecting && (
             <div className="text-center text-sm text-crypto-text-secondary animate-pulse">
-              Connecting...
+              {t('connecting')}
             </div>
           )}
         </div>

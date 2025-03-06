@@ -3,6 +3,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { availableLanguages, getLanguageName, Language } from "@/i18n";
 
 interface SettingsModalProps {
   open: boolean;
@@ -11,9 +13,10 @@ interface SettingsModalProps {
 
 const SettingsModal = ({ open, onOpenChange }: SettingsModalProps) => {
   const { isDarkMode, toggleTheme } = useTheme();
+  const { language, setLanguage, t } = useLanguage();
 
   const handleLanguageChange = (value: string) => {
-    console.log('Language changed:', value);
+    setLanguage(value as Language);
   };
 
   return (
@@ -21,12 +24,12 @@ const SettingsModal = ({ open, onOpenChange }: SettingsModalProps) => {
       <DialogContent className="glass-card border-white/10 sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold text-center">
-            Settings
+            {t('settings')}
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-6 py-4">
           <div className="flex items-center justify-between">
-            <Label htmlFor="dark-mode">Dark Mode</Label>
+            <Label htmlFor="dark-mode">{t('dark_mode')}</Label>
             <Switch
               id="dark-mode"
               onCheckedChange={toggleTheme}
@@ -35,14 +38,17 @@ const SettingsModal = ({ open, onOpenChange }: SettingsModalProps) => {
           </div>
           
           <div className="space-y-2">
-            <Label>Language</Label>
-            <Select defaultValue="en" onValueChange={handleLanguageChange}>
+            <Label>{t('language')}</Label>
+            <Select value={language} onValueChange={handleLanguageChange}>
               <SelectTrigger className="w-full bg-white/5">
-                <SelectValue placeholder="Select language" />
+                <SelectValue placeholder={t('select_language')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="en">English</SelectItem>
-                <SelectItem value="es">Español</SelectItem>
+                {availableLanguages.map((lang) => (
+                  <SelectItem key={lang} value={lang}>
+                    {getLanguageName(lang)}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>

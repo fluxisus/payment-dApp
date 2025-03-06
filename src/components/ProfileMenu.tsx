@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { 
   DropdownMenu,
@@ -10,6 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Settings, UserRound, Copy, LogOut } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface ProfileMenuProps {
   account: string;
@@ -19,6 +19,7 @@ interface ProfileMenuProps {
 
 const ProfileMenu = ({ account, onDisconnect, onOpenSettings }: ProfileMenuProps) => {
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
 
   const shortenAddress = (address: string) => {
@@ -28,8 +29,8 @@ const ProfileMenu = ({ account, onDisconnect, onOpenSettings }: ProfileMenuProps
   const copyAddressToClipboard = () => {
     navigator.clipboard.writeText(account);
     toast({
-      title: "Address copied",
-      description: "Wallet address copied to clipboard",
+      title: t('address_copied'),
+      description: t('address_copied_desc'),
     });
     setIsOpen(false);
   };
@@ -66,7 +67,7 @@ const ProfileMenu = ({ account, onDisconnect, onOpenSettings }: ProfileMenuProps
           onClick={copyAddressToClipboard}
         >
           <Copy className="w-4 h-4" />
-          <span>Copy Address</span>
+          <span>{t('copy_address')}</span>
         </DropdownMenuItem>
         
         <DropdownMenuItem 
@@ -77,7 +78,7 @@ const ProfileMenu = ({ account, onDisconnect, onOpenSettings }: ProfileMenuProps
           }}
         >
           <Settings className="w-4 h-4" />
-          <span>Settings</span>
+          <span>{t('settings')}</span>
         </DropdownMenuItem>
         
         <DropdownMenuSeparator className="bg-white/10" />
@@ -90,7 +91,7 @@ const ProfileMenu = ({ account, onDisconnect, onOpenSettings }: ProfileMenuProps
           }}
         >
           <LogOut className="w-4 h-4" />
-          <span>Disconnect</span>
+          <span>{t('disconnect_wallet')}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

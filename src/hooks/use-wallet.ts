@@ -1,5 +1,6 @@
 import { useAccount, useConnect, useDisconnect, useSwitchChain } from "wagmi";
 import { useToast } from "./use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export function useWallet() {
   const { address, isConnected, chainId } = useAccount();
@@ -7,6 +8,7 @@ export function useWallet() {
   const { disconnect } = useDisconnect();
   const { switchChain, chains } = useSwitchChain();
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   const connector = connectors[0]; // MetaMask connector
 
@@ -14,21 +16,24 @@ export function useWallet() {
     try {
       if (!connector) {
         toast({
-          title: "MetaMask not available",
-          description:
-            "Please install MetaMask extension or use MetaMask mobile app",
+          title: t("metamask_not_available"),
+          description: t("metamask_not_available_desc"),
           variant: "destructive",
         });
         return;
       }
 
       await connect({ connector });
+      toast({
+        title: t("success"),
+        description: t("wallet_connected"),
+      });
     } catch (error) {
       console.error("Error connecting to wallet:", error);
       const errorMessage =
-        error instanceof Error ? error.message : "Failed to connect to wallet";
+        error instanceof Error ? error.message : t("wallet_connection_error");
       toast({
-        title: "Connection failed",
+        title: t("error"),
         description: errorMessage,
         variant: "destructive",
       });
@@ -39,8 +44,8 @@ export function useWallet() {
     try {
       disconnect();
       toast({
-        title: "Wallet disconnected",
-        description: "Your wallet has been disconnected from this dApp",
+        title: t("success"),
+        description: t("wallet_disconnected"),
       });
     } catch (error) {
       console.error("Error disconnecting wallet:", error);
@@ -50,12 +55,16 @@ export function useWallet() {
   const switchNetwork = async (chainId: number) => {
     try {
       await switchChain({ chainId });
+      toast({
+        title: t("success"),
+        description: t("network_changed"),
+      });
     } catch (error) {
       console.error("Error switching chain:", error);
       const errorMessage =
-        error instanceof Error ? error.message : "Failed to switch network";
+        error instanceof Error ? error.message : t("network_change_error");
       toast({
-        title: "Network switch failed",
+        title: t("error"),
         description: errorMessage,
         variant: "destructive",
       });

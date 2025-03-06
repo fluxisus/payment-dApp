@@ -1,6 +1,18 @@
 export const en = {
   // Common
   loading: "Loading...",
+  connecting: "Connecting...",
+
+  // Navigation
+  not_found_title: "404",
+  not_found_description: "Oops! Page not found",
+  return_home: "Return to Home",
+
+  // Buttons
+  proceed_to_payment: "Proceed to Payment",
+
+  // Error messages
+  wallet_connection_failed: "Failed to connect to wallet. Please try again.",
 
   // Header
   connect_wallet: "Connect Wallet",
@@ -9,6 +21,10 @@ export const en = {
   // Main actions
   charge: "Charge",
   pay: "Pay",
+
+  // Form fields
+  enter_id: "Enter ID",
+  token: "Token",
 
   // Balance section
   balance: "Balance",
@@ -31,6 +47,31 @@ export const en = {
   copy_address: "Copy Address",
   address_copied: "Address copied",
   address_copied_desc: "Wallet address copied to clipboard",
+
+  // Toast Messages
+  success: "Success",
+  error: "Error",
+  warning: "Warning",
+  info: "Information",
+  transaction_sent: "Transaction Sent",
+  transaction_confirmed: "Transaction Confirmed",
+  transaction_error: "Transaction Error",
+  network_changed: "Network Changed",
+  network_change_error: "Network Change Error",
+  wallet_connected: "Wallet Connected",
+  wallet_disconnected: "Wallet Disconnected",
+  wallet_connection_error: "Wallet Connection Error",
+  metamask_not_available: "MetaMask Not Available",
+  metamask_not_available_desc:
+    "Please install MetaMask extension or use MetaMask mobile app",
+  qr_code_generated: "QR Code Generated",
+  qr_code_copied: "QR Code Copied",
+  qr_code_error: "QR Code Error",
+  payment_processing: "Payment Processing",
+  payment_success: "Payment Success",
+  payment_error: "Payment Error",
+  charge_created: "Charge Created",
+  charge_error: "Charge Error",
 
   // Pay modal
   scanning_qr: "Scanning QR code...",

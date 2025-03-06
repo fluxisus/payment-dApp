@@ -1,6 +1,19 @@
 export const es = {
   // Common
   loading: "Cargando...",
+  connecting: "Conectando...",
+
+  // Navigation
+  not_found_title: "404",
+  not_found_description: "¡Ups! Página no encontrada",
+  return_home: "Volver al Inicio",
+
+  // Buttons
+  proceed_to_payment: "Proceder al Pago",
+
+  // Error messages
+  wallet_connection_failed:
+    "Error al conectar la billetera. Por favor, inténtalo de nuevo.",
 
   // Header
   connect_wallet: "Conectar Billetera",
@@ -9,6 +22,10 @@ export const es = {
   // Main actions
   charge: "Cobrar",
   pay: "Pagar",
+
+  // Form fields
+  enter_id: "Ingresar ID",
+  token: "Token",
 
   // Balance section
   balance: "Saldo",
@@ -31,6 +48,31 @@ export const es = {
   copy_address: "Copiar Dirección",
   address_copied: "Dirección copiada",
   address_copied_desc: "Dirección de la billetera copiada al portapapeles",
+
+  // Toast Messages
+  success: "Éxito",
+  error: "Error",
+  warning: "Advertencia",
+  info: "Información",
+  transaction_sent: "Transacción Enviada",
+  transaction_confirmed: "Transacción Confirmada",
+  transaction_error: "Error en la Transacción",
+  network_changed: "Red Cambiada",
+  network_change_error: "Error al Cambiar de Red",
+  wallet_connected: "Billetera Conectada",
+  wallet_disconnected: "Billetera Desconectada",
+  wallet_connection_error: "Error de Conexión de Billetera",
+  metamask_not_available: "MetaMask No Disponible",
+  metamask_not_available_desc:
+    "Por favor, instala la extensión MetaMask o usa la aplicación móvil de MetaMask",
+  qr_code_generated: "Código QR Generado",
+  qr_code_copied: "Código QR Copiado",
+  qr_code_error: "Error en el Código QR",
+  payment_processing: "Procesando Pago",
+  payment_success: "Pago Exitoso",
+  payment_error: "Error en el Pago",
+  charge_created: "Cobro Creado",
+  charge_error: "Error en el Cobro",
 
   // Pay modal
   scanning_qr: "Escaneando código QR...",

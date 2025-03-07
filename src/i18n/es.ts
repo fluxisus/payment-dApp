@@ -14,6 +14,9 @@ export const es = {
   // Error messages
   wallet_connection_failed:
     "Error al conectar la billetera. Por favor, inténtalo de nuevo.",
+  wallet_not_connected: "Billetera No Conectada",
+  connect_wallet_first:
+    "Por favor, conecta tu billetera primero para crear un cobro",
 
   // Header
   connect_wallet: "Conectar Billetera",

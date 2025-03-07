@@ -13,6 +13,8 @@ export const en = {
 
   // Error messages
   wallet_connection_failed: "Failed to connect to wallet. Please try again.",
+  wallet_not_connected: "Wallet Not Connected",
+  connect_wallet_first: "Please connect your wallet first to create a charge",
 
   // Header
   connect_wallet: "Connect Wallet",

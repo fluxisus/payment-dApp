@@ -6,6 +6,8 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useWallet } from "@/hooks/use-wallet";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 
 interface ChargeModalProps {
   open: boolean;
@@ -30,7 +32,8 @@ const NETWORKS = {
 
 const ChargeModal = ({ open, onOpenChange }: ChargeModalProps) => {
   const { t } = useLanguage();
-  const { address, chainId } = useWallet();
+  const { address, chainId, isConnected } = useWallet();
+  const { toast } = useToast();
   const [formData, setFormData] = useState({
     id: "",
     token: "USDT",
@@ -82,6 +85,14 @@ const ChargeModal = ({ open, onOpenChange }: ChargeModalProps) => {
                      formData.address.trim() !== "";
 
   const handleCreatePayment = () => {
+    if (!isConnected) {
+      toast({
+        title: t('wallet_not_connected'),
+        description: t('connect_wallet_first'),
+        variant: "destructive",
+      });
+      return;
+    }
     // TODO: Implement payment creation logic
     console.log("Creating payment with data:", formData);
   };
@@ -98,7 +109,7 @@ const ChargeModal = ({ open, onOpenChange }: ChargeModalProps) => {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="glass-card border-crypto-border sm:max-w-md max-h-[90vh] overflow-hidden flex flex-col">
+      <DialogContent className="glass-card border-crypto-border sm:max-w-md max-h-[85vh] overflow-hidden flex flex-col">
         {/* Network Banner */}
         <div className="flex items-center justify-center gap-2 py-2 border-b border-white/10">
           <img 
@@ -111,14 +122,18 @@ const ChargeModal = ({ open, onOpenChange }: ChargeModalProps) => {
           </span>
         </div>
 
-        <DialogHeader className="px-6 pt-4">
+        <DialogHeader className="px-4 pt-4">
           <DialogTitle className="text-xl font-semibold text-center">
             {t('charge')}
           </DialogTitle>
         </DialogHeader>
 
-        {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto px-6">
+        {/* Main Content - Custom Scrollbar */}
+        <div className={cn(
+          "flex-1 px-4 overflow-y-auto",
+          "scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/20 hover:scrollbar-thumb-white/30",
+          "scrollbar-track-rounded-full scrollbar-thumb-rounded-full"
+        )}>
           <div className="space-y-6 py-4">
             {/* ID and Amount Inputs */}
             <div className="space-y-4">
@@ -147,13 +162,9 @@ const ChargeModal = ({ open, onOpenChange }: ChargeModalProps) => {
 
               <div className="space-y-2">
                 <Label htmlFor="address">{t('address')}</Label>
-                <Input
-                  id="address"
-                  value={formData.address}
-                  onChange={e => setFormData(prev => ({ ...prev, address: e.target.value }))}
-                  className="bg-white/5"
-                  placeholder={t('address')}
-                />
+                <div className="px-3 py-2 font-mono text-sm tracking-tight text-foreground">
+                  {formData.address}
+                </div>
               </div>
             </div>
 
@@ -200,47 +211,45 @@ const ChargeModal = ({ open, onOpenChange }: ChargeModalProps) => {
                 )}
               </button>
 
-              {/* Extra Fields Content - Scrollable */}
+              {/* Extra Fields Content */}
               {showExtraFields && (
-                <div className="max-h-[300px] overflow-y-auto">
-                  <div className="space-y-4 p-4 bg-white/5 rounded-xl">
-                    {/* Payment Description */}
-                    <div>
-                      <Input
-                        id="description"
-                        value={formData.description}
-                        onChange={e => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                        className="bg-white/5"
-                        placeholder={t('description')}
-                      />
-                    </div>
+                <div className="space-y-4 p-4 bg-white/5 rounded-xl">
+                  {/* Payment Description */}
+                  <div>
+                    <Input
+                      id="description"
+                      value={formData.description}
+                      onChange={e => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                      className="bg-white/5"
+                      placeholder={t('description')}
+                    />
+                  </div>
 
-                    {/* Merchant Information */}
-                    <div className="space-y-4">
-                      <Input
-                        id="merchantName"
-                        value={formData.merchantName}
-                        onChange={e => setFormData(prev => ({ ...prev, merchantName: e.target.value }))}
-                        className="bg-white/5"
-                        placeholder={t('merchant_name')}
-                      />
+                  {/* Merchant Information */}
+                  <div className="space-y-4">
+                    <Input
+                      id="merchantName"
+                      value={formData.merchantName}
+                      onChange={e => setFormData(prev => ({ ...prev, merchantName: e.target.value }))}
+                      className="bg-white/5"
+                      placeholder={t('merchant_name')}
+                    />
 
-                      <Input
-                        id="merchantDescription"
-                        value={formData.merchantDescription}
-                        onChange={e => setFormData(prev => ({ ...prev, merchantDescription: e.target.value }))}
-                        className="bg-white/5"
-                        placeholder={t('merchant_description')}
-                      />
+                    <Input
+                      id="merchantDescription"
+                      value={formData.merchantDescription}
+                      onChange={e => setFormData(prev => ({ ...prev, merchantDescription: e.target.value }))}
+                      className="bg-white/5"
+                      placeholder={t('merchant_description')}
+                    />
 
-                      <Input
-                        id="merchantTaxId"
-                        value={formData.merchantTaxId}
-                        onChange={e => setFormData(prev => ({ ...prev, merchantTaxId: e.target.value }))}
-                        className="bg-white/5"
-                        placeholder={t('tax_id')}
-                      />
-                    </div>
+                    <Input
+                      id="merchantTaxId"
+                      value={formData.merchantTaxId}
+                      onChange={e => setFormData(prev => ({ ...prev, merchantTaxId: e.target.value }))}
+                      className="bg-white/5"
+                      placeholder={t('tax_id')}
+                    />
                   </div>
                 </div>
               )}
@@ -249,7 +258,7 @@ const ChargeModal = ({ open, onOpenChange }: ChargeModalProps) => {
         </div>
 
         {/* Create Payment Button - Fixed at bottom */}
-        <div className="px-6 py-4 border-t border-white/10">
+        <div className="px-4 py-4 border-t border-white/10">
           <Button
             onClick={handleCreatePayment}
             disabled={!isFormValid}

@@ -18,7 +18,7 @@ const Index = () => {
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
   const [isLoadingOrder, setIsLoadingOrder] = useState(false);
   const [paymentData, setPaymentData] = useState<QrReadResponse | null>(null);
-  const { isConnected, isNetworkSwitching } = useWallet();
+  const { isConnected } = useWallet();
   const chainId = useChainId();
   const { toast } = useToast();
   const { t } = useLanguage();
@@ -29,11 +29,6 @@ const Index = () => {
 
   // Fetch token transactions
   const { transactions, isLoading: isLoadingTransactions } = useTokenTransactions();
-
-  // Debug log for network switching state
-  useEffect(() => {
-    console.log("Network switching state:", isNetworkSwitching);
-  }, [isNetworkSwitching]);
 
   // Define tokens with their balances
   const tokenBalances = [
@@ -108,6 +103,18 @@ const Index = () => {
 
   const supportedTokens = getSupportedTokens();
 
+  const handleChargeClick = () => {
+    if (!isConnected) {
+      toast({
+        title: t('wallet_not_connected'),
+        description: t('connect_wallet_first'),
+        variant: "destructive",
+      });
+      return;
+    }
+    setIsChargeModalOpen(true);
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-crypto-dark">
       <Header />
@@ -117,7 +124,7 @@ const Index = () => {
         <div className="glass-card p-6 max-w-2xl mx-auto w-full">
           <div className="flex justify-center gap-4 w-full">
             <button
-              onClick={() => setIsChargeModalOpen(true)}
+              onClick={handleChargeClick}
               className="w-full py-4 rounded-xl bg-purple-600 hover:bg-purple-700
                        flex items-center justify-center text-lg font-medium
                        transition-all duration-200 hover:scale-[1.02] active:scale-95"
@@ -161,7 +168,7 @@ const Index = () => {
                       </div>
                       <div className="text-2xl font-semibold">
                         {isConnected ? (
-                          isNetworkSwitching || tokenBalance.isLoading ? (
+                          tokenBalance.isLoading ? (
                             <div className="flex items-center">
                               <Loader2 className="w-5 h-5 mr-2 animate-spin text-crypto-primary" />
                               <span className="text-gray-400">{t('loading')}</span>

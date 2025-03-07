@@ -139,4 +139,15 @@ export const es = {
   sepolia: "Sepolia (Testnet)",
   unknown_network: "la red seleccionada",
   network_with_id: "Red {id}",
+
+  // Charge modal
+  additional_details: "Detalles Adicionales",
+  description: "Descripción",
+  enter_description: "Ingrese descripción",
+  merchant_name: "Nombre del Comerciante",
+  enter_merchant_name: "Ingrese nombre del comerciante",
+  merchant_description: "Descripción del Comerciante",
+  enter_merchant_description: "Ingrese descripción del comerciante",
+  enter_tax_id: "Ingrese ID fiscal",
+  create_payment: "Crear Pago",
 };

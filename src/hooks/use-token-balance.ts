@@ -1,6 +1,12 @@
 import { useState, useEffect } from "react";
 import { useAccount, useReadContract, useChainId } from "wagmi";
 import { formatUnits } from "viem";
+import {
+  isTokenSupportedOnNetwork,
+  getTokenAddress,
+  TOKEN_ADDRESSES,
+  type TokenSymbol,
+} from "@/lib/networks";
 
 // ERC20 ABI (minimal for balance checking)
 const erc20ABI = [
@@ -20,67 +26,25 @@ const erc20ABI = [
   },
 ] as const;
 
-// Network IDs
-export const NETWORKS = {
-  ETHEREUM: 1,
-  POLYGON: 137,
-  BSC: 56,
-};
-
-// Token information with network-specific addresses
-export const TOKENS = {
+// Token metadata
+const TOKEN_METADATA = {
   USDC: {
-    // Token metadata (same across networks)
     decimals: 6,
     symbol: "USDC",
     icon: "https://assets.belo.app/images/usdc.png",
-    // Network-specific addresses and overrides
-    addresses: {
-      [NETWORKS.ETHEREUM]: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-      [NETWORKS.POLYGON]: "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
-      [NETWORKS.BSC]: "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d",
-    },
-    // Network-specific decimal overrides (if needed)
     networkDecimals: {
-      [NETWORKS.BSC]: 18, // Override if BSC reports different decimals
+      56: 18, // BSC override
     },
   },
   USDT: {
-    // Token metadata (same across networks)
     decimals: 6,
     symbol: "USDT",
     icon: "https://assets.belo.app/images/usdt.png",
-    // Network-specific addresses
-    addresses: {
-      [NETWORKS.ETHEREUM]: "0xdAC17F958D2ee523a2206206994597C13D831ec7",
-      [NETWORKS.POLYGON]: "0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
-      [NETWORKS.BSC]: "0x55d398326f99059fF775485246999027B3197955",
-    },
-    // Network-specific decimal overrides (if needed)
     networkDecimals: {
-      [NETWORKS.BSC]: 18, // Override if BSC reports different decimals
+      56: 18, // BSC override
     },
   },
-};
-
-export type TokenSymbol = keyof typeof TOKENS;
-
-// Helper function to check if a token is supported on the current network
-export function isTokenSupportedOnNetwork(
-  tokenSymbol: TokenSymbol,
-  chainId: number,
-): boolean {
-  return !!TOKENS[tokenSymbol].addresses[chainId];
-}
-
-// Helper function to get token address for the current network
-export function getTokenAddressForNetwork(
-  tokenSymbol: TokenSymbol,
-  chainId: number,
-): `0x${string}` | undefined {
-  const address = TOKENS[tokenSymbol].addresses[chainId];
-  return address ? (address as `0x${string}`) : undefined;
-}
+} as const;
 
 export function useTokenBalance(tokenSymbol: TokenSymbol) {
   const [formattedBalance, setFormattedBalance] = useState<string>("0");
@@ -90,8 +54,10 @@ export function useTokenBalance(tokenSymbol: TokenSymbol) {
 
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
-  const token = TOKENS[tokenSymbol];
-  const tokenAddress = getTokenAddressForNetwork(tokenSymbol, chainId);
+  const token = TOKEN_METADATA[tokenSymbol];
+  const tokenAddress = getTokenAddress(tokenSymbol, chainId) as
+    | `0x${string}`
+    | undefined;
 
   // Get the correct decimals for the current network
   const tokenDecimals = token.networkDecimals?.[chainId] || token.decimals;

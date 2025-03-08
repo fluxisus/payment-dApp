@@ -1,7 +1,7 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { QrReadResponse } from "./api";
-import { NETWORKS } from "@/hooks/use-token-balance";
+import { NETWORKS } from "@/lib/networks";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));

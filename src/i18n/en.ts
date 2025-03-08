@@ -149,5 +149,5 @@ export const en = {
   merchant_description: "Merchant Description",
   enter_merchant_description: "Enter merchant description",
   enter_tax_id: "Enter tax ID",
-  create_payment: "Create Payment",
+  create_payment_instructions_req: "Create instructions",
 };

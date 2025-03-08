@@ -151,5 +151,5 @@ export const es = {
   merchant_description: "Descripción del Comerciante",
   enter_merchant_description: "Ingrese descripción del comerciante",
   enter_tax_id: "Ingrese ID fiscal",
-  create_payment: "Crear Pago",
+  create_payment_instructions_req: "Generar instrucciones",
 };

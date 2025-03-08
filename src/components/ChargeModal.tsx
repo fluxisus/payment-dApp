@@ -8,27 +8,18 @@ import { useWallet } from "@/hooks/use-wallet";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { BACKEND_API_BASE_URL } from "@/lib/constants";
+import { 
+  NETWORKS, 
+  getNaspipNetwork, 
+  getTokenAddress, 
+  type TokenSymbol 
+} from "@/lib/networks";
 
 interface ChargeModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
-
-// Network configurations
-const NETWORKS = {
-  1: { 
-    translationKey: "ethereum" as const, 
-    icon: "https://assets.belo.app/images/eth.png" 
-  },
-  137: { 
-    translationKey: "polygon" as const, 
-    icon: "https://assets.belo.app/images/blockchains/polygon.png" 
-  },
-  56: { 
-    translationKey: "bsc" as const, 
-    icon: "https://assets.belo.app/images/blockchains/bsc.png" 
-  },
-};
 
 const ChargeModal = ({ open, onOpenChange }: ChargeModalProps) => {
   const { t } = useLanguage();
@@ -36,7 +27,7 @@ const ChargeModal = ({ open, onOpenChange }: ChargeModalProps) => {
   const { toast } = useToast();
   const [formData, setFormData] = useState({
     id: "",
-    token: "USDT",
+    token: "USDT" as TokenSymbol,
     amount: "",
     address: "",
     description: "",
@@ -51,7 +42,7 @@ const ChargeModal = ({ open, onOpenChange }: ChargeModalProps) => {
     if (open) {
       setFormData({
         id: "",
-        token: "USDT",
+        token: "USDT" as TokenSymbol,
         amount: "",
         address: address || "",
         description: "",
@@ -75,8 +66,8 @@ const ChargeModal = ({ open, onOpenChange }: ChargeModalProps) => {
   };
 
   const tokenOptions = [
-    { value: "USDT", icon: "https://assets.belo.app/images/usdt.png" },
-    { value: "USDC", icon: "https://assets.belo.app/images/usdc.png" },
+    { value: "USDT" as TokenSymbol, icon: "https://assets.belo.app/images/usdt.png" },
+    { value: "USDC" as TokenSymbol, icon: "https://assets.belo.app/images/usdc.png" },
   ];
 
   // Check if required fields are filled
@@ -84,7 +75,7 @@ const ChargeModal = ({ open, onOpenChange }: ChargeModalProps) => {
                      formData.amount.trim() !== "" && 
                      formData.address.trim() !== "";
 
-  const handleCreatePayment = () => {
+  const handleCreatePayment = async () => {
     if (!isConnected) {
       toast({
         title: t('wallet_not_connected'),
@@ -93,18 +84,105 @@ const ChargeModal = ({ open, onOpenChange }: ChargeModalProps) => {
       });
       return;
     }
-    // TODO: Implement payment creation logic
-    console.log("Creating payment with data:", formData);
+
+    if (!chainId) {
+      toast({
+        title: t('error'),
+        description: t('network_mismatch'),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      // Get current timestamp and add 1 hour for expiration
+      const expiresAt = Date.now() + 3600000; // 1 hour in milliseconds
+
+      // Get NASPIP network identifier
+      const naspipNetwork = getNaspipNetwork(chainId);
+      if (!naspipNetwork) {
+        throw new Error('Unsupported network');
+      }
+
+      // Get token address for the current network
+      const tokenAddress = getTokenAddress(formData.token, chainId);
+      if (!tokenAddress) {
+        throw new Error('Token not supported on this network');
+      }
+
+      // Create NASPIP network_token format
+      const network_token = `n${naspipNetwork}_t${tokenAddress}`;
+
+      // Prepare the request body
+      const requestBody = {
+        payment: {
+          id: formData.id,
+          address: formData.address,
+          network_token,
+          is_open: false,
+          amount: formData.amount,
+          expires_at: expiresAt
+        },
+        ...(formData.merchantName || formData.merchantDescription || formData.merchantTaxId ? {
+          order: {
+            total_amount: formData.amount,
+            coin_code: formData.token,
+            merchant: {
+              name: formData.merchantName,
+              description: formData.merchantDescription,
+              tax_id: formData.merchantTaxId
+            },
+            items: []
+          }
+        } : {})
+      };
+
+      console.log('Sending request with body:', requestBody); // For debugging
+
+      const response = await fetch(`${BACKEND_API_BASE_URL}/v1/qr/create`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null);
+        throw new Error(errorData?.message || 'Failed to create payment instructions');
+      }
+
+      const data = await response.json();
+      
+      // Show success toast
+      toast({
+        title: t('success'),
+        description: t('charge_created'),
+      });
+
+      // Close the modal
+      onOpenChange(false);
+
+    } catch (error) {
+      console.error('Error creating payment:', error);
+      toast({
+        title: t('error'),
+        description: error instanceof Error ? error.message : t('charge_error'),
+        variant: "destructive",
+      });
+    }
   };
 
   // Get network name based on chainId
   const getNetworkName = (id: number) => {
-    return t(NETWORKS[id as keyof typeof NETWORKS]?.translationKey || 'unknown_network');
+    const network = getNaspipNetwork(id);
+    return t(network ? NETWORKS[network].translationKey : 'unknown_network');
   };
 
   // Get network icon based on chainId
   const getNetworkIcon = (id: number) => {
-    return NETWORKS[id as keyof typeof NETWORKS]?.icon || NETWORKS[1].icon;
+    const network = getNaspipNetwork(id);
+    return network ? NETWORKS[network].icon : NETWORKS.erc20.icon;
   };
 
   return (
@@ -264,7 +342,7 @@ const ChargeModal = ({ open, onOpenChange }: ChargeModalProps) => {
             disabled={!isFormValid}
             className="w-full button-primary"
           >
-            {t('create_payment')}
+            {t('create_payment_instructions_req')}
           </Button>
         </div>
       </DialogContent>

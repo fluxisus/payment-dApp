@@ -63,7 +63,8 @@
     "vaul": "^0.9.3",
     "viem": "^2.23.5",
     "wagmi": "^2.14.12",
-    "zod": "^3.23.8"
+    "zod": "^3.23.8",
+    "@naspip/core": "github:fluxisus/naspip#v0.0.0-alpha"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",

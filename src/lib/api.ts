@@ -1,8 +1,5 @@
 import { toast } from "@/components/ui/use-toast";
-
-// Base URL for the Fluxis API
-const API_BASE_URL = "https://api.fluxis.us";
-
+import { BACKEND_API_BASE_URL } from "@/lib/constants";
 // Interface for the QR read response
 export interface QrReadResponse {
   data: {
@@ -59,7 +56,7 @@ export async function readQrToken(
     const requestBody = { token };
     console.log("Request body:", requestBody);
 
-    const response = await fetch(`${API_BASE_URL}/v1/qr/read`, {
+    const response = await fetch(`${BACKEND_API_BASE_URL}/v1/qr/read`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -97,7 +94,7 @@ export async function generateQrToken(
   paymentData: any,
 ): Promise<string | null> {
   try {
-    const response = await fetch(`${API_BASE_URL}/v1/qr/generate`, {
+    const response = await fetch(`${BACKEND_API_BASE_URL}/v1/qr/generate`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

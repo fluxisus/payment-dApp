@@ -4,13 +4,19 @@ import ChargeModal from "@/components/ChargeModal";
 import OrderModal from "@/components/OrderModal";
 import { useState, useEffect } from "react";
 import { useWallet } from "@/hooks/use-wallet";
-import { useTokenBalance, TOKENS, TokenSymbol, isTokenSupportedOnNetwork } from "@/hooks/use-token-balance";
+import { useTokenBalance } from "@/hooks/use-token-balance";
 import { useTokenTransactions } from "@/hooks/use-token-transactions";
 import { useChainId } from "wagmi";
 import { readQrToken, QrReadResponse } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { 
+  isTokenSupportedOnNetwork,
+  type TokenSymbol,
+  NETWORKS,
+  TOKEN_METADATA
+} from "@/lib/networks";
 
 const Index = () => {
   const [isPayModalOpen, setIsPayModalOpen] = useState(false);
@@ -31,21 +37,21 @@ const Index = () => {
   const { transactions, isLoading: isLoadingTransactions } = useTokenTransactions();
 
   // Define tokens with their balances
-  const tokenBalances = [
-    { 
+  const balanceCards = [
+    {
       token: "USDT", 
       amount: usdtBalance, 
-      icon: TOKENS.USDT.icon,
+      icon: TOKEN_METADATA.USDT.icon,
       isLoading: isLoadingUsdt,
       isSupported: isUsdtSupported
     },
-    { 
+    {
       token: "USDC", 
       amount: usdcBalance, 
-      icon: TOKENS.USDC.icon,
+      icon: TOKEN_METADATA.USDC.icon,
       isLoading: isLoadingUsdc,
       isSupported: isUsdcSupported
-    },
+    }
   ];
 
   // Handle NASPIP token detection
@@ -151,7 +157,7 @@ const Index = () => {
             </div>
           ) : (
             <div className="flex flex-col gap-4">
-              {tokenBalances
+              {balanceCards
                 .filter(token => token.isSupported)
                 .map((tokenBalance) => (
                   <div key={tokenBalance.token} className="p-4 bg-white/5 rounded-xl">

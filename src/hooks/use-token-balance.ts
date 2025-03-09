@@ -85,9 +85,15 @@ export function useTokenBalance(tokenSymbol: TokenSymbol) {
       return;
     }
 
-    if (!isConnected || !balance) {
+    if (!isConnected) {
       setFormattedBalance("0.00");
       setIsLoading(false);
+      return;
+    }
+
+    // Keep loading state true while waiting for balance
+    if (!balance) {
+      setIsLoading(true);
       return;
     }
 

@@ -177,7 +177,6 @@ const Index = () => {
                           tokenBalance.isLoading ? (
                             <div className="flex items-center">
                               <Loader2 className="w-5 h-5 mr-2 animate-spin text-crypto-primary" />
-                              <span className="text-gray-400">{t('loading')}</span>
                             </div>
                           ) : (
                             tokenBalance.amount

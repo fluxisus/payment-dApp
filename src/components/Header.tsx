@@ -110,7 +110,7 @@ export const Header = () => {
           value={isConnected ? (chainId?.toString() || "1") : selectedNetwork}
           onValueChange={handleNetworkChange}
         >
-          <SelectTrigger className={`bg-transparent border-crypto-border ${isMobile ? 'w-[60px]' : 'w-[140px]'}`}>
+          <SelectTrigger className={`bg-transparent border-crypto-border ${isMobile ? 'w-[60px] px-2' : 'w-[140px]'}`}>
             {isMobile ? (
               <img 
                 src={currentNetwork.icon} 

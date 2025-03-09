@@ -36,13 +36,17 @@ jobs:
       - name: Build application
         run: bun run build
 
+      - name: Install Wrangler
+        run: bun add -g wrangler
+
       - name: Deploy to Cloudflare Pages
-        uses: cloudflare/wrangler-action@v3
         id: deploy
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy dist --project-name=fluxis-dapp
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          DEPLOY_URL=$(bun wrangler pages deploy dist --project-name=fluxis-dapp --json | jq -r '.url')
+          echo "url=$DEPLOY_URL" >> "$GITHUB_OUTPUT"
 
       - name: Debug deployment output
         run: |
@@ -51,11 +55,10 @@ jobs:
           # Note: Zone ID is not available in the outputs
 
       - name: Update DNS Record
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          command: |
-            dns record upsert --type CNAME --name "dapp" --content "${{ steps.deploy.outputs.url }}" --zone-id "${{ secrets.CLOUDFLARE_ZONE_ID }}" --proxied true
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          bun wrangler dns record upsert --type CNAME --name "dapp" --content "${{ steps.deploy.outputs.url }}" --zone-id "${{ secrets.CLOUDFLARE_ZONE_ID }}" --proxied true
 
       - name: Update Deployment Status
         if: always()

@@ -37,7 +37,7 @@ jobs:
         run: bun run build
 
       - name: Install Wrangler
-        run: bun add -g wrangler
+        run: bun add wrangler
 
       - name: Deploy to Cloudflare Pages
         id: deploy
@@ -45,7 +45,7 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
-          DEPLOY_URL=$(bun wrangler pages deploy dist --project-name=fluxis-dapp --json | jq -r '.url')
+          DEPLOY_URL=$(bunx wrangler pages deploy dist --project-name=fluxis-dapp --json | jq -r '.url')
           echo "url=$DEPLOY_URL" >> "$GITHUB_OUTPUT"
 
       - name: Debug deployment output
@@ -58,7 +58,7 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: |
-          bun wrangler dns record upsert --type CNAME --name "dapp" --content "${{ steps.deploy.outputs.url }}" --zone-id "${{ secrets.CLOUDFLARE_ZONE_ID }}" --proxied true
+          bunx wrangler dns record upsert --type CNAME --name "dapp" --content "${{ steps.deploy.outputs.url }}" --zone-id "${{ secrets.CLOUDFLARE_ZONE_ID }}" --proxied true
 
       - name: Update Deployment Status
         if: always()

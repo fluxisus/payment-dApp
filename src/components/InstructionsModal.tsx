@@ -99,7 +99,7 @@ const InstructionsModal = ({ open, onOpenChange, qrData }: InstructionsModalProp
               className="w-12 h-12 p-2 hover:bg-white/10 transition-colors group"
               onClick={handleCopyLink}
             >
-              <Link className="w-full h-full text-white/80 group-hover:text-white transition-colors" />
+              <Link className="w-full h-full text-gray-800 dark:text-white/80 group-hover:text-gray-900 dark:group-hover:text-white transition-colors" />
             </Button>
           </div>
         </div>

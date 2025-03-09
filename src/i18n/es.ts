@@ -152,4 +152,12 @@ export const es = {
   enter_merchant_description: "Ingrese descripción del comerciante",
   enter_tax_id: "Ingrese ID fiscal",
   create_payment_instructions_req: "Generar instrucciones",
+
+  // Instructions modal
+  payment_instructions_ready: "¡Instrucciones de Pago Listas!",
+  share_on_whatsapp: "Compartir en WhatsApp",
+  share_on_telegram: "Compartir en Telegram",
+  share_instructions: "Compartir Instrucciones",
+  link_copied: "Enlace copiado al portapapeles",
+  copy_failed: "Error al copiar el enlace",
 };

@@ -150,4 +150,12 @@ export const en = {
   enter_merchant_description: "Enter merchant description",
   enter_tax_id: "Enter tax ID",
   create_payment_instructions_req: "Create instructions",
+
+  // Instructions modal
+  payment_instructions_ready: "Payment Instructions Ready!",
+  share_on_whatsapp: "Share on WhatsApp",
+  share_on_telegram: "Share on Telegram",
+  share_instructions: "Share Instructions",
+  link_copied: "Link copied to clipboard",
+  copy_failed: "Failed to copy link",
 };

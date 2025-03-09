@@ -14,6 +14,8 @@ export const es = {
   // Error messages
   wallet_connection_failed:
     "Error al conectar la billetera. Por favor, inténtalo de nuevo.",
+  wallet_not_connected: "Billetera No Conectada",
+  connect_wallet_first: "Conexión a billetera requerida",
 
   // Header
   connect_wallet: "Conectar Billetera",
@@ -139,4 +141,23 @@ export const es = {
   sepolia: "Sepolia (Testnet)",
   unknown_network: "la red seleccionada",
   network_with_id: "Red {id}",
+
+  // Charge modal
+  additional_details: "Detalles Adicionales",
+  description: "Descripción",
+  enter_description: "Ingrese descripción",
+  merchant_name: "Nombre del Comerciante",
+  enter_merchant_name: "Ingrese nombre del comerciante",
+  merchant_description: "Descripción del Comerciante",
+  enter_merchant_description: "Ingrese descripción del comerciante",
+  enter_tax_id: "Ingrese ID fiscal",
+  create_payment_instructions_req: "Generar instrucciones",
+
+  // Instructions modal
+  payment_instructions_ready: "¡Instrucciones de Pago Listas!",
+  share_on_whatsapp: "Compartir en WhatsApp",
+  share_on_telegram: "Compartir en Telegram",
+  share_instructions: "Compartir Instrucciones",
+  link_copied: "Enlace copiado al portapapeles",
+  copy_failed: "Error al copiar el enlace",
 };

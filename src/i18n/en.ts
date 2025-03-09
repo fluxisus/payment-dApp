@@ -13,6 +13,8 @@ export const en = {
 
   // Error messages
   wallet_connection_failed: "Failed to connect to wallet. Please try again.",
+  wallet_not_connected: "Wallet Not Connected",
+  connect_wallet_first: "Connected wallet required",
 
   // Header
   connect_wallet: "Connect Wallet",
@@ -137,4 +139,23 @@ export const en = {
   sepolia: "Sepolia (Testnet)",
   unknown_network: "the selected network",
   network_with_id: "Network {id}",
+
+  // Charge modal
+  additional_details: "Additional Details",
+  description: "Description",
+  enter_description: "Enter description",
+  merchant_name: "Merchant Name",
+  enter_merchant_name: "Enter merchant name",
+  merchant_description: "Merchant Description",
+  enter_merchant_description: "Enter merchant description",
+  enter_tax_id: "Enter tax ID",
+  create_payment_instructions_req: "Create instructions",
+
+  // Instructions modal
+  payment_instructions_ready: "Payment Instructions Ready!",
+  share_on_whatsapp: "Share on WhatsApp",
+  share_on_telegram: "Share on Telegram",
+  share_instructions: "Share Instructions",
+  link_copied: "Link copied to clipboard",
+  copy_failed: "Failed to copy link",
 };

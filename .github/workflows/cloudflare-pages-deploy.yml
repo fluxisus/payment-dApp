@@ -1,0 +1,68 @@
+name: Deploy to Cloudflare Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create GitHub Deployment
+        uses: chrnorm/deployment-action@v2
+        id: deployment
+        with:
+          token: ${{ github.token }}
+          environment: production
+          description: "Deploy to Cloudflare Pages"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        id: deploy
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name=fluxis-dapp
+
+      - name: Debug deployment output
+        run: |
+          echo "Deployment URL: ${{ steps.deploy.outputs.url }}"
+          echo "Deployment ID: ${{ steps.deploy.outputs.deployment_id }}"
+          # Note: Zone ID is not available in the outputs
+
+      - name: Update DNS Record
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          command: |
+            dns record upsert --type CNAME --name "dapp" --content "${{ steps.deploy.outputs.url }}" --zone-id "${{ secrets.CLOUDFLARE_ZONE_ID }}" --proxied true
+
+      - name: Update Deployment Status
+        if: always()
+        uses: chrnorm/deployment-status@v2
+        with:
+          token: ${{ github.token }}
+          deployment-id: ${{ steps.deployment.outputs.deployment_id }}
+          state: ${{ job.status == 'success' && 'success' || 'failure' }}
+          environment-url: https://dapp.fluxis.us

@@ -17,9 +17,11 @@ import {
 
 // Logo size constants - can be adjusted here for easy maintenance
 const LOGO_SIZES = {
-  small: "w-8 h-8",
-  medium: "w-12 h-12",
-  large: "w-16 h-16",
+  small: "w-12 h-12",
+  medium: "w-16 h-16",
+  large: "w-20 h-20",
+  xlarge: "w-24 h-24",
+  '2xlarge': "w-32 h-32", // 128px
 };
 
 // Network configurations
@@ -39,7 +41,7 @@ export const Header = () => {
   const { t } = useLanguage();
   
   // Current logo size - change this to use any of the predefined sizes
-  const logoSize = LOGO_SIZES.large;
+  const logoSize = LOGO_SIZES['xlarge'];
 
   // Update selectedNetwork when chainId changes (after connection)
   useEffect(() => {
@@ -93,8 +95,8 @@ export const Header = () => {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 px-6 py-4 flex items-center justify-between bg-crypto-dark/50 backdrop-blur-lg border-b border-crypto-border">
-      <div className="flex items-center gap-2">
+    <header className="fixed top-0 left-0 right-0 z-50 px-5 flex items-center justify-between bg-crypto-dark/50 backdrop-blur-lg border-b border-crypto-border">
+      <div className="flex items-center -my-4">
         <img 
           src={isDarkMode ? "/fluxis_dark_mode.svg" : "/fluxis_light_mode.svg"} 
           alt="Fluxis Logo" 
@@ -102,7 +104,7 @@ export const Header = () => {
         />
       </div>
       
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3">
         {/* Network selector - always visible and enabled regardless of connection status */}
         <Select 
           value={isConnected ? (chainId?.toString() || "1") : selectedNetwork}

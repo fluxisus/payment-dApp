@@ -28,10 +28,6 @@ const ProfileMenu = ({ account, onDisconnect, onOpenSettings }: ProfileMenuProps
 
   const copyAddressToClipboard = () => {
     navigator.clipboard.writeText(account);
-    toast({
-      title: t('address_copied'),
-      description: t('address_copied_desc'),
-    });
     setIsOpen(false);
   };
 

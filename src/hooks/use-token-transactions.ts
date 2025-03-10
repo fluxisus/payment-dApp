@@ -67,27 +67,8 @@ export function useTokenTransactions() {
           if (!tokenAddress) continue;
 
           // TODO: Implement actual API call to fetch transactions
-          // This is a placeholder that simulates fetching transactions
-          const mockTransactions: Transfer[] = [
-            {
-              id: "1",
-              from: "0x123...",
-              to: address,
-              timestamp: new Date().toISOString(),
-              token,
-              type: "Received",
-              amount: "100",
-            },
-          ];
-
-          allTransactions.push(...mockTransactions);
+          // For now, return empty array until API implementation is ready
         }
-
-        // Sort transactions by timestamp (newest first)
-        allTransactions.sort(
-          (a, b) =>
-            new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
-        );
 
         setTransactions(allTransactions);
         setError(null);

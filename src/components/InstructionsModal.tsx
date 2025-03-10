@@ -18,10 +18,6 @@ const InstructionsModal = ({ open, onOpenChange, qrData }: InstructionsModalProp
   const handleCopyLink = async () => {
     try {
       await navigator.clipboard.writeText(qrData);
-      toast({
-        title: t('success'),
-        description: t('link_copied'),
-      });
     } catch (err) {
       console.error('Failed to copy:', err);
       toast({

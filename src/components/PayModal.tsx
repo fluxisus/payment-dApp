@@ -153,11 +153,9 @@ const PayModal = ({ open, onOpenChange, onTokenDetected }: PayModalProps) => {
         
         // If QR code found
         if (code) {
-          console.log("QR code detected:", code.data);
           
           // If it's a NASPIP token, process it
           if (code.data.startsWith("naspip")) {
-            console.log("NASPIP QR code detected:", code.data);
             
             // Stop scanning
             if (scanIntervalRef.current) {
@@ -168,7 +166,6 @@ const PayModal = ({ open, onOpenChange, onTokenDetected }: PayModalProps) => {
             // Turn off camera
             if (streamRef.current) {
               streamRef.current.getTracks().forEach(track => {
-                console.log("Stopping camera track:", track.label);
                 track.stop();
               });
               streamRef.current = null;
@@ -201,7 +198,6 @@ const PayModal = ({ open, onOpenChange, onTokenDetected }: PayModalProps) => {
       // Get available video devices
       const devices = await navigator.mediaDevices.enumerateDevices();
       const videoDevices = devices.filter(device => device.kind === 'videoinput');
-      console.log('Available video devices:', videoDevices);
 
       // Simple camera request - don't set srcObject here
       const stream = await navigator.mediaDevices.getUserMedia({ 
@@ -215,7 +211,6 @@ const PayModal = ({ open, onOpenChange, onTokenDetected }: PayModalProps) => {
       // Set state to show camera - the effect will handle setting srcObject
       setShowCamera(true);
       
-      console.log('Camera stream obtained:', stream.getVideoTracks().map(t => t.label));
     } catch (error) {
       console.error("Camera error:", error);
       toast({
@@ -239,10 +234,6 @@ const PayModal = ({ open, onOpenChange, onTokenDetected }: PayModalProps) => {
         setIsProcessing(false);
         return;
       }
-
-      // Log the token for debugging
-      console.log("NASPIP token detected:", token);
-
       // Close the Pay modal
       onOpenChange(false);
       
@@ -282,7 +273,6 @@ const PayModal = ({ open, onOpenChange, onTokenDetected }: PayModalProps) => {
         });
         return;
       }
-      console.log("Clipboard content:", text);
       
       if (!text) {
         toast({
@@ -325,7 +315,6 @@ const PayModal = ({ open, onOpenChange, onTokenDetected }: PayModalProps) => {
   };
 
   const handleProceedToPayment = async () => {
-    console.log("Proceeding to payment for ID:", paymentInfo?.id);
     // Payment logic will be implemented here
   };
 

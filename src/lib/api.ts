@@ -51,10 +51,7 @@ export async function readQrToken(
   token: string,
 ): Promise<QrReadResponse | null> {
   try {
-    // Log the token and request body for debugging
-    console.log("Token to be sent:", token);
     const requestBody = { token };
-    console.log("Request body:", requestBody);
 
     const response = await fetch(`${BACKEND_API_BASE_URL}/v1/qr/read`, {
       method: "POST",
@@ -71,7 +68,6 @@ export async function readQrToken(
     }
 
     const data = await response.json();
-    console.log("QR token read successfully:", data);
     return data as QrReadResponse;
   } catch (error) {
     console.error("Error reading QR token:", error);
@@ -109,7 +105,6 @@ export async function generateQrToken(
     }
 
     const data = await response.json();
-    console.log("QR token generated successfully:", data);
     return data.token;
   } catch (error) {
     console.error("Error generating QR token:", error);

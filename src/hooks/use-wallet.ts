@@ -24,10 +24,6 @@ export function useWallet() {
       }
 
       await connect({ connector });
-      toast({
-        title: t("success"),
-        description: t("wallet_connected"),
-      });
     } catch (error) {
       console.error("Error connecting to wallet:", error);
       const errorMessage =
@@ -43,10 +39,6 @@ export function useWallet() {
   const disconnectWallet = () => {
     try {
       disconnect();
-      toast({
-        title: t("success"),
-        description: t("wallet_disconnected"),
-      });
     } catch (error) {
       console.error("Error disconnecting wallet:", error);
     }
@@ -55,10 +47,6 @@ export function useWallet() {
   const switchNetwork = async (chainId: number) => {
     try {
       await switchChain({ chainId });
-      toast({
-        title: t("success"),
-        description: t("network_changed"),
-      });
     } catch (error) {
       console.error("Error switching chain:", error);
       const errorMessage =

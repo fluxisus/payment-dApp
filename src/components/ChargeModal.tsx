@@ -145,8 +145,6 @@ const ChargeModal = ({ open, onOpenChange }: ChargeModalProps) => {
         } : {})
       };
 
-      console.log('Sending request with body:', requestBody); // For debugging
-
       const response = await fetch(`${BACKEND_API_BASE_URL}/v1/qr/create`, {
         method: 'POST',
         headers: {
@@ -162,12 +160,6 @@ const ChargeModal = ({ open, onOpenChange }: ChargeModalProps) => {
 
       const data = await response.json();
       
-      // Show success toast
-      toast({
-        title: t('success'),
-        description: t('charge_created'),
-      });
-
       // Set QR data and show instructions modal
       setQrData(data.data.qrData);
       setShowInstructions(true);

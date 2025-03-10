@@ -150,13 +150,6 @@ const OrderModal = ({ open, onOpenChange, paymentData, isLoading }: OrderModalPr
       const decimals = 6;
       const amount = parseUnits(paymentInfo.amount, decimals);
 
-      console.log("Initiating payment transaction:", {
-        tokenAddress,
-        recipientAddress,
-        amount: amount.toString(),
-        paymentId: paymentInfo.id
-      });
-
       // Set the transfer args to trigger the simulation
       setTransferArgs({
         address: tokenAddress,
@@ -165,11 +158,6 @@ const OrderModal = ({ open, onOpenChange, paymentData, isLoading }: OrderModalPr
 
       // Mark payment as initiated
       setPaymentInitiated(true);
-
-      toast({
-        title: "Payment Initiated",
-        description: "Preparing your transaction...",
-      });
     } catch (error) {
       console.error("Error processing payment:", error);
       toast({
@@ -185,10 +173,6 @@ const OrderModal = ({ open, onOpenChange, paymentData, isLoading }: OrderModalPr
     if (simulateData && simulateData.request && paymentInitiated) {
       try {
         writeContract(simulateData.request);
-        toast({
-          title: "Transaction Sent",
-          description: "Your transaction has been submitted to the blockchain",
-        });
       } catch (error) {
         console.error("Error sending transaction:", error);
         toast({
@@ -334,9 +318,9 @@ const OrderModal = ({ open, onOpenChange, paymentData, isLoading }: OrderModalPr
                     <p className="text-crypto-text-secondary">Network:</p>
                     <p>{getNetworkName(paymentInfo.networkId)}</p>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="space-y-1">
                     <p className="text-crypto-text-secondary">Recipient:</p>
-                    <p className="truncate max-w-[200px]">{paymentInfo.address}</p>
+                    <p className="break-all">{paymentInfo.address}</p>
                   </div>
                 </div>
               </div>

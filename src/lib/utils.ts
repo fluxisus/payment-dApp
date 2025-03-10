@@ -23,15 +23,18 @@ export function parseNetworkToken(networkToken: string): {
     // Split by _t to get network and token address
     const [networkPart, tokenAddress] = networkToken.split("_t");
 
+    // Remove the 'n' prefix from network part
+    const networkName = networkPart.substring(1);
+
     // Map network name to network ID
     let networkId: number | null = null;
 
-    if (networkPart === "nethereum") {
-      networkId = NETWORKS.ETHEREUM;
-    } else if (networkPart === "npolygon") {
-      networkId = NETWORKS.POLYGON;
-    } else if (networkPart === "nbsc") {
-      networkId = NETWORKS.BSC;
+    if (networkName === "ethereum") {
+      networkId = NETWORKS.erc20.metamaskNetworkId;
+    } else if (networkName === "polygon") {
+      networkId = NETWORKS.polygon.metamaskNetworkId;
+    } else if (networkName === "bsc") {
+      networkId = NETWORKS.bep20.metamaskNetworkId;
     }
 
     return {

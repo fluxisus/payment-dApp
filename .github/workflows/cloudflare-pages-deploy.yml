@@ -11,19 +11,10 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      deployments: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Create GitHub Deployment
-        uses: chrnorm/deployment-action@v2
-        id: deployment
-        with:
-          token: ${{ github.token }}
-          environment: production
-          description: "Deploy to Cloudflare Pages"
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
@@ -44,27 +35,4 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: |
-          DEPLOY_URL=$(bunx wrangler pages deploy dist --project-name=fluxis-dapp --json | jq -r '.url')
-          echo "url=$DEPLOY_URL" >> "$GITHUB_OUTPUT"
-
-      - name: Debug deployment output
-        run: |
-          echo "Deployment URL: ${{ steps.deploy.outputs.url }}"
-          echo "Deployment ID: ${{ steps.deploy.outputs.deployment_id }}"
-          # Note: Zone ID is not available in the outputs
-
-      - name: Update DNS Record
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-        run: |
-          bunx wrangler dns record upsert --type CNAME --name "dapp" --content "${{ steps.deploy.outputs.url }}" --zone-id "${{ secrets.CLOUDFLARE_ZONE_ID }}" --proxied true
-
-      - name: Update Deployment Status
-        if: always()
-        uses: chrnorm/deployment-status@v2
-        with:
-          token: ${{ github.token }}
-          deployment-id: ${{ steps.deployment.outputs.deployment_id }}
-          state: ${{ job.status == 'success' && 'success' || 'failure' }}
-          environment-url: https://dapp.fluxis.us
+        run: bunx wrangler pages deploy --project-name=fluxis-dapp dist

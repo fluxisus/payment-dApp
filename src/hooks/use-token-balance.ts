@@ -67,7 +67,7 @@ export function useTokenBalance(tokenSymbol: TokenSymbol) {
     setIsSupported(isTokenSupportedOnNetwork(tokenSymbol, chainId));
   }, [tokenSymbol, chainId]);
 
-  const { data: balance } = useReadContract({
+  const { data: balance, status: readStatus } = useReadContract({
     address: tokenAddress,
     abi: erc20ABI,
     functionName: "balanceOf",
@@ -91,33 +91,51 @@ export function useTokenBalance(tokenSymbol: TokenSymbol) {
       return;
     }
 
-    // Keep loading state true while waiting for balance
-    if (!balance) {
+    // Show loading state while fetching balance
+    if (readStatus === "pending") {
       setIsLoading(true);
       return;
     }
 
-    try {
-      // Format the balance with the correct number of decimals for the current network
-      const formatted = formatUnits(balance as bigint, tokenDecimals);
-
-      // Convert to number and always format to exactly 2 decimal places
-      const numValue = parseFloat(formatted);
-      const twoDecimalValue = numValue.toFixed(2);
-
-      // Format with commas for thousands separators
-      const parts = twoDecimalValue.split(".");
-      parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-
-      setFormattedBalance(parts.join("."));
+    // If we have no balance data after loading is complete, show 0.00
+    if (!balance && readStatus === "success") {
+      setFormattedBalance("0.00");
       setIsLoading(false);
-      setError(null);
-    } catch (err) {
-      console.error(`Error formatting ${tokenSymbol} balance:`, err);
-      setError(err instanceof Error ? err : new Error(String(err)));
-      setIsLoading(false);
+      return;
     }
-  }, [balance, isConnected, tokenDecimals, tokenSymbol, isSupported, chainId]);
+
+    // If we have balance data, format it
+    if (balance) {
+      try {
+        // Format the balance with the correct number of decimals for the current network
+        const formatted = formatUnits(balance as bigint, tokenDecimals);
+
+        // Convert to number and always format to exactly 2 decimal places
+        const numValue = parseFloat(formatted);
+        const twoDecimalValue = numValue.toFixed(2);
+
+        // Format with commas for thousands separators
+        const parts = twoDecimalValue.split(".");
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+        setFormattedBalance(parts.join("."));
+        setIsLoading(false);
+        setError(null);
+      } catch (err) {
+        console.error(`Error formatting ${tokenSymbol} balance:`, err);
+        setError(err instanceof Error ? err : new Error(String(err)));
+        setIsLoading(false);
+      }
+    }
+  }, [
+    balance,
+    readStatus,
+    isConnected,
+    tokenDecimals,
+    tokenSymbol,
+    isSupported,
+    chainId,
+  ]);
 
   return { balance: formattedBalance, isLoading, error, isSupported };
 }

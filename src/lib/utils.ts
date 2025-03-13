@@ -57,11 +57,13 @@ export function parseNetworkToken(networkToken: string): {
  * @returns Payment information object
  */
 export function extractPaymentInfo(response: QrReadResponse) {
-  const payment = response.data.payload.payload.payment;
-  const order = response.data.payload.payload.order;
+  const payment = response.data.payload.data.payment;
+  const order = response.data.payload.data.order;
 
   // Parse the network token to get network ID and token address
-  const { networkId, tokenAddress } = parseNetworkToken(payment.network_token);
+  const { networkId, tokenAddress } = parseNetworkToken(
+    payment.unique_asset_id,
+  );
 
   return {
     id: payment.id,
@@ -73,7 +75,7 @@ export function extractPaymentInfo(response: QrReadResponse) {
     expiresAt: payment.expires_at,
     order: order
       ? {
-          totalAmount: order.total_amount,
+          totalAmount: order.total,
           coinCode: order.coin_code,
           merchant: order.merchant,
           items: order.items,

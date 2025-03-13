@@ -119,21 +119,21 @@ const ChargeModal = ({ open, onOpenChange }: ChargeModalProps) => {
       }
 
       // Create NASPIP network_token format
-      const network_token = `n${naspipNetwork}_t${tokenAddress}`;
+      const unique_asset_id = `n${naspipNetwork}_t${tokenAddress}`;
 
       // Prepare the request body
       const requestBody = {
         payment: {
           id: formData.id,
           address: formData.address,
-          network_token,
+          unique_asset_id,
           is_open: false,
           amount: formData.amount,
           expires_at: expiresAt
         },
         ...(formData.merchantName || formData.merchantDescription || formData.merchantTaxId ? {
           order: {
-            total_amount: formData.amount,
+            total: formData.amount,
             coin_code: formData.token,
             merchant: {
               name: formData.merchantName,

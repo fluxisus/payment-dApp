@@ -4,17 +4,17 @@ import { BACKEND_API_BASE_URL } from "@/lib/constants";
 export interface QrReadResponse {
   data: {
     payload: {
-      payload: {
+      data: {
         payment: {
           id: string;
           address: string;
-          network_token: string;
+          unique_asset_id: string;
           is_open: boolean;
           amount: string;
           expires_at: number;
         };
         order?: {
-          total_amount: string;
+          total: string;
           coin_code: string;
           merchant: {
             name: string;

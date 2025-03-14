@@ -53,7 +53,7 @@ export async function readQrToken(
   try {
     const requestBody = { token };
 
-    const response = await fetch(`${BACKEND_API_BASE_URL}/v1/qr/read`, {
+    const response = await fetch(`${BACKEND_API_BASE_URL}/public/qr/read`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -90,7 +90,7 @@ export async function generateQrToken(
   paymentData: any,
 ): Promise<string | null> {
   try {
-    const response = await fetch(`${BACKEND_API_BASE_URL}/v1/qr/generate`, {
+    const response = await fetch(`${BACKEND_API_BASE_URL}/public/qr/create`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

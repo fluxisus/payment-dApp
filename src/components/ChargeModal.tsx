@@ -145,7 +145,7 @@ const ChargeModal = ({ open, onOpenChange }: ChargeModalProps) => {
         } : {})
       };
 
-      const response = await fetch(`${BACKEND_API_BASE_URL}/v1/qr/create`, {
+      const response = await fetch(`${BACKEND_API_BASE_URL}/public/qr/create`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

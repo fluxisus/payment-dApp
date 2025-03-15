@@ -161,7 +161,7 @@ const ChargeModal = ({ open, onOpenChange }: ChargeModalProps) => {
       const data = await response.json();
       
       // Set QR data and show instructions modal
-      setQrData(data.data.qrData);
+      setQrData(data.qrValue);
       setShowInstructions(true);
       
       // Close the charge modal

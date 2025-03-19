@@ -2,44 +2,42 @@ import { toast } from "@/components/ui/use-toast";
 import { BACKEND_API_BASE_URL } from "@/lib/constants";
 // Interface for the QR read response
 export interface QrReadResponse {
-  data: {
-    payload: {
-      data: {
-        payment: {
-          id: string;
-          address: string;
-          unique_asset_id: string;
-          is_open: boolean;
-          amount: string;
-          expires_at: number;
-        };
-        order?: {
-          total: string;
-          coin_code: string;
-          merchant: {
-            name: string;
-            description: string;
-            tax_id: string;
-          };
-          items: Array<{
-            description: string;
-            amount: string;
-            unit_price: string;
-            quantity: number;
-            coin_code: string;
-          }>;
-        };
+  payload: {
+    data: {
+      payment: {
+        id: string;
+        address: string;
+        unique_asset_id: string;
+        is_open: boolean;
+        amount: string;
+        expires_at: number;
       };
-      kid: string;
-      kis: string;
-      kep: string;
-      iat: string;
-      exp: string;
-      iss: string;
+      order?: {
+        total: string;
+        coin_code: string;
+        merchant: {
+          name: string;
+          description: string;
+          tax_id: string;
+        };
+        items: Array<{
+          description: string;
+          amount: string;
+          unit_price: string;
+          quantity: number;
+          coin_code: string;
+        }>;
+      };
     };
-    version: string;
-    purpose: string;
+    kid: string;
+    kis: string;
+    kep: string;
+    iat: string;
+    exp: string;
+    iss: string;
   };
+  version: string;
+  purpose: string;
 }
 
 /**

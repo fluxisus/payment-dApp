@@ -262,18 +262,18 @@ const OrderModal = ({ open, onOpenChange, paymentData, isLoading }: OrderModalPr
                   )}
                   <div className="text-xs text-crypto-text-secondary mt-2">
                     From: {
-                      isValidUrl(paymentData.data.payload.iss) ? (
+                      isValidUrl(paymentData.payload.iss) ? (
                         <a 
-                          href={paymentData.data.payload.iss} 
+                          href={paymentData.payload.iss} 
                           target="_blank" 
                           rel="noopener noreferrer"
                           className="text-crypto-accent hover:text-crypto-accent-hover hover:underline inline-flex items-center"
                         >
-                          {paymentData.data.payload.iss}
+                          {paymentData.payload.iss}
                           <ExternalLink className="ml-1 w-3 h-3" />
                         </a>
                       ) : (
-                        paymentData.data.payload.iss
+                        paymentData.payload.iss
                       )
                     }
                   </div>

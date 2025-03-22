@@ -1,3 +1,26 @@
+// Wallet Connectors Configurations
+export const WALLETS = [
+  {
+    name: "MetaMask",
+    icon: "https://assets.pcswap.org/web/wallets/metamask.png",
+    id: "metaMask",
+  },
+  {
+    name: "Trust Wallet",
+    icon: "https://assets.pcswap.org/web/wallets/trust.png",
+    id: "injected",
+  },
+  {
+    name: "WalletConnect",
+    icon: "https://assets.pcswap.org/web/wallets/walletconnect.png",
+    id: "walletConnect",
+  },
+  {
+    name: "Coinbase Wallet",
+    icon: "https://assets.pcswap.org/web/wallets/coinbase.png",
+    id: "coinbaseWallet",
+  },
+];
 // Network configurations
 export const NETWORKS = {
   erc20: {

@@ -2,8 +2,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Camera, QrCode, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useState, useRef, useEffect } from "react";
-import { readQrToken, QrReadResponse } from "@/lib/api";
-import { extractPaymentInfo, parseNetworkToken } from "@/lib/utils";
+import { QrReadResponse } from "@/lib/api";
+import { extractPaymentInfo } from "@/lib/utils";
 import { useWallet } from "@/hooks/use-wallet";
 import jsQR from "jsqr";
 import { ProceedToPaymentButton } from "@/components/ProceedToPaymentButton";
@@ -18,7 +18,7 @@ interface PayModalProps {
 const PayModal = ({ open, onOpenChange, onTokenDetected }: PayModalProps) => {
   const { toast } = useToast();
   const { t } = useLanguage();
-  const { isConnected, chainId, switchNetwork } = useWallet();
+  const { chainId, switchNetwork } = useWallet();
   const [showCamera, setShowCamera] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);

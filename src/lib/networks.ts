@@ -22,21 +22,30 @@ export const WALLETS = [
   },
 ];
 // Network configurations
-export const NETWORKS = {
-  erc20: {
+export const MapChainIdToNetworkData = {
+  1: {
+    naspipNetwork: "erc20",
+    networkLabel: "Ethereum",
+    networkShortName: "ETH",
     translationKey: "ethereum" as const,
     icon: "https://assets.belo.app/images/eth.png",
-    metamaskNetworkId: 1,
+    chainId: 1,
   },
-  polygon: {
+  137: {
+    naspipNetwork: "polygon",
+    networkLabel: "Polygon PoS",
+    networkShortName: "MATIC",
     translationKey: "polygon" as const,
     icon: "https://assets.belo.app/images/blockchains/polygon.png",
-    metamaskNetworkId: 137,
+    chainId: 137,
   },
-  bep20: {
+  56: {
+    naspipNetwork: "bep20",
+    networkLabel: "BNB Smart Chain (BEP20)",
+    networkShortName: "BNB",
     translationKey: "bsc" as const,
     icon: "https://assets.belo.app/images/blockchains/bsc.png",
-    metamaskNetworkId: 56,
+    chainId: 56,
   },
 } as const;
 
@@ -74,21 +83,28 @@ export const TOKEN_ADDRESSES = {
   },
 } as const;
 
-export type NaspipNetwork = keyof typeof NETWORKS;
 export type TokenSymbol = keyof typeof TOKEN_ADDRESSES;
 
+export const getNetworkTranslationKey = (chainId: number) => {
+  return MapChainIdToNetworkData[chainId]?.translationKey ?? "unknown_network";
+};
+
 // Helper function to get NASPIP network from chainId
-export const getNaspipNetwork = (
-  chainId: number,
-): NaspipNetwork | undefined => {
-  return Object.entries(NETWORKS).find(
-    ([_, network]) => network.metamaskNetworkId === chainId,
-  )?.[0] as NaspipNetwork | undefined;
+export const getNaspipNetwork = (chainId: number) => {
+  return MapChainIdToNetworkData[chainId]?.naspipNetwork;
+};
+
+export const getNetworkIcon = (chainId: number) => {
+  return MapChainIdToNetworkData[chainId]?.icon;
 };
 
 // Helper function to get chainId from NASPIP network
-export const getChainId = (naspipNetwork: NaspipNetwork): number => {
-  return NETWORKS[naspipNetwork].metamaskNetworkId;
+export const getChainId = (naspipNetwork: string): number => {
+  const network = Object.values(MapChainIdToNetworkData).find(
+    (network) => network.naspipNetwork === naspipNetwork,
+  );
+
+  return network?.chainId ?? 0;
 };
 
 // Helper function to check if a token is supported on a network
@@ -107,6 +123,10 @@ export const getTokenAddress = (
   chainId: number,
 ): string | undefined => {
   const network = getNaspipNetwork(chainId);
-  if (!network) return undefined;
+
+  if (!network) {
+    return;
+  }
+
   return TOKEN_ADDRESSES[token][network];
 };

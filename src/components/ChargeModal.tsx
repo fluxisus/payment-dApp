@@ -10,9 +10,10 @@ import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { BACKEND_API_BASE_URL } from "@/lib/constants";
 import { 
-  NETWORKS, 
   getNaspipNetwork, 
+  getNetworkTranslationKey, 
   getTokenAddress, 
+  getNetworkIcon,
   type TokenSymbol 
 } from "@/lib/networks";
 import InstructionsModal from "./InstructionsModal";
@@ -180,16 +181,13 @@ const ChargeModal = ({ open, onOpenChange }: ChargeModalProps) => {
   };
 
   // Get network name based on chainId
-  const getNetworkName = (id: number) => {
-    const network = getNaspipNetwork(id);
-    return t(network ? NETWORKS[network].translationKey : 'unknown_network');
+  const getNetworkName = (chainId: number) => {
+    const networkTransalationKey = getNetworkTranslationKey(chainId) ?? "unknown_network";
+    return t(networkTransalationKey);
   };
 
   // Get network icon based on chainId
-  const getNetworkIcon = (id: number) => {
-    const network = getNaspipNetwork(id);
-    return network ? NETWORKS[network].icon : NETWORKS.erc20.icon;
-  };
+  const networkIcon = getNetworkIcon(chainId) ?? getNetworkIcon(1);
 
   return (
     <>
@@ -198,7 +196,7 @@ const ChargeModal = ({ open, onOpenChange }: ChargeModalProps) => {
           {/* Network Banner */}
           <div className="flex items-center justify-center gap-2 py-2 border-b border-white/10">
             <img 
-              src={getNetworkIcon(chainId || 1)}
+              src={networkIcon}
               alt={getNetworkName(chainId || 1)}
               className="w-6 h-6"
             />

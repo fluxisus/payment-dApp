@@ -12,8 +12,8 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
 } from "./ui/select";
+import { getNetworkTranslationKey, MapChainIdToNetworkData } from "@/lib/networks";
 
 // Logo size constants - can be adjusted here for easy maintenance
 const LOGO_SIZES = {
@@ -22,13 +22,6 @@ const LOGO_SIZES = {
   large: "w-20 h-20",
   xlarge: "w-24 h-24",
   '2xlarge': "w-32 h-32", // 128px
-};
-
-// Network configurations
-const NETWORKS = {
-  1: { name: "Ethereum", icon: "https://assets.belo.app/images/eth.png", shortName: "ETH" },
-  137: { name: "Polygon", icon: "https://assets.belo.app/images/blockchains/polygon.png", shortName: "MATIC" },
-  56: { name: "BSC", icon: "https://assets.belo.app/images/blockchains/bsc.png", shortName: "BNB" },
 };
 
 export const Header = () => {
@@ -73,6 +66,7 @@ export const Header = () => {
   const handleNetworkChange = (value: string) => {
     // Store the selected network value
     setSelectedNetwork(value);
+    console.log(value);
     
     // If connected, also switch the network in the wallet
     if (isConnected) {
@@ -82,15 +76,11 @@ export const Header = () => {
 
   // Get current network info based on connection status
   const networkId = isConnected ? chainId : parseInt(selectedNetwork);
-  const currentNetwork = networkId && NETWORKS[networkId as keyof typeof NETWORKS] 
-    ? NETWORKS[networkId as keyof typeof NETWORKS] 
-    : NETWORKS[1]; // Default to Ethereum if network not found
+  const currentNetwork = MapChainIdToNetworkData[networkId] ?? MapChainIdToNetworkData[1]; // Default to Ethereum if network not found
 
   // Get translated network name
-  const getNetworkName = (id: number) => {
-    const networkKey = id === 1 ? 'ethereum' : 
-                      id === 137 ? 'polygon' : 
-                      id === 56 ? 'bsc' : 'unknown_network';
+  const getNetworkName = (chainId: number) => {
+    const networkKey = getNetworkTranslationKey(chainId);
     return t(networkKey);
   };
 
@@ -129,18 +119,20 @@ export const Header = () => {
             )}
           </SelectTrigger>
           <SelectContent>
-            {chains.map((chain) => (
+            {chains.map((chain) => {
+              const network = MapChainIdToNetworkData[chain.id];
+              return (
               <SelectItem key={chain.id} value={chain.id.toString()}>
                 <div className="flex items-center gap-2">
                   <img 
-                    src={NETWORKS[chain.id as keyof typeof NETWORKS]?.icon || "https://assets.belo.app/images/eth.png"} 
-                    alt={getNetworkName(chain.id)} 
+                    src={network?.icon} 
+                    alt={network?.networkLabel} 
                     className="w-5 h-5 rounded-full"
                   />
                   <span>{getNetworkName(chain.id)}</span>
                 </div>
               </SelectItem>
-            ))}
+            )})}
           </SelectContent>
         </Select>
 

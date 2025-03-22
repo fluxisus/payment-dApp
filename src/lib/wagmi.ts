@@ -7,34 +7,53 @@ import {
   coinbaseWallet,
 } from "wagmi/connectors";
 
-// Wallet Connect Project ID - Reemplaza esto con tu propio ID de proyecto de WalletConnect
+// Wallet Connect Project ID
 const walletConnectProjectId = "cf0fac857aec7620f15bea51034ba021";
 
-// Create a custom BSC chain with the name "BSC" instead of "BNB Smart Chain"
+// Create a custom BSC chain with multiple RPC endpoints for better reliability
 const customBsc = {
   ...bsc,
   name: "BSC",
+  rpcUrls: {
+    default: {
+      http: [
+        "https://bsc-dataseed.binance.org",
+        "https://bsc-dataseed1.binance.org",
+        "https://bsc-dataseed2.binance.org",
+        "https://bsc-dataseed3.binance.org",
+        "https://bsc-dataseed4.binance.org",
+      ],
+    },
+    public: {
+      http: [
+        "https://bsc-dataseed.binance.org",
+        "https://bsc-dataseed1.binance.org",
+        "https://bsc-dataseed2.binance.org",
+        "https://bsc-dataseed3.binance.org",
+        "https://bsc-dataseed4.binance.org",
+      ],
+    },
+  },
 };
 
 export function getWagmiConfig() {
   return createConfig({
-    chains: [mainnet, polygon, customBsc],
+    chains: [customBsc, mainnet, polygon],
+    transports: {
+      [customBsc.id]: http(),
+      [mainnet.id]: http(),
+      [polygon.id]: http(),
+    },
     connectors: [
       metaMask(),
       walletConnect({
         projectId: walletConnectProjectId,
         showQrModal: true,
       }),
-      // Trust Wallet es compatible con el conector injected
       injected(),
       coinbaseWallet({
         appName: "Fluxis dApp",
       }),
     ],
-    transports: {
-      [mainnet.id]: http(),
-      [polygon.id]: http(),
-      [customBsc.id]: http(),
-    },
   });
 }

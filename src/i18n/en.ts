@@ -6,15 +6,15 @@ export const en = {
   // Navigation
   not_found_title: "404",
   not_found_description: "Oops! Page not found",
-  return_home: "Return to Home",
+  return_home: "Return Home",
 
   // Buttons
   proceed_to_payment: "Proceed to Payment",
 
   // Error messages
-  wallet_connection_failed: "Failed to connect to wallet. Please try again.",
+  wallet_connection_failed: "Failed to connect wallet. Please try again.",
   wallet_not_connected: "Wallet Not Connected",
-  connect_wallet_first: "Connected wallet required",
+  connect_wallet_first: "Wallet connection required",
 
   // Header
   connect_wallet: "Connect Wallet",
@@ -47,14 +47,14 @@ export const en = {
 
   // Profile Menu
   copy_address: "Copy Address",
-  address_copied: "Address copied",
+  address_copied: "Address Copied",
   address_copied_desc: "Wallet address copied to clipboard",
 
   // Toast Messages
   success: "Success",
   error: "Error",
   warning: "Warning",
-  info: "Information",
+  info: "Info",
   transaction_sent: "Transaction Sent",
   transaction_confirmed: "Transaction Confirmed",
   transaction_error: "Transaction Error",
@@ -65,7 +65,10 @@ export const en = {
   wallet_connection_error: "Wallet Connection Error",
   metamask_not_available: "MetaMask Not Available",
   metamask_not_available_desc:
-    "Please install MetaMask extension or use MetaMask mobile app",
+    "Please install the MetaMask extension or use another compatible wallet.",
+  wallet_not_available: "Wallet Not Available",
+  wallet_not_available_desc:
+    "The selected wallet is not available. Please install the corresponding extension or app.",
   qr_code_generated: "QR Code Generated",
   qr_code_copied: "QR Code Copied",
   qr_code_error: "QR Code Error",

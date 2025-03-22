@@ -8,42 +8,34 @@ import { useState } from "react";
 import { AlertCircle } from "lucide-react";
 import { useWallet } from "@/hooks/use-wallet";
 import { useLanguage } from "@/contexts/LanguageContext";
-
+import { WALLETS } from "@/lib/networks";
 interface WalletModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-const WALLETS = [
-  {
-    name: "MetaMask",
-    icon: "https://assets.pcswap.org/web/wallets/metamask.png",
-  },
-  {
-    name: "Trust Wallet",
-    icon: "https://assets.pcswap.org/web/wallets/trust.png",
-  },
-];
-
 const WalletModal = ({ open, onOpenChange }: WalletModalProps) => {
-  const { connectWallet, isConnecting } = useWallet();
+  const { connectWallet, isConnecting, connectors } = useWallet();
   const { t } = useLanguage();
   const [error, setError] = useState<string | null>(null);
 
-  const handleConnect = async (walletName: string) => {
-    if (walletName === "MetaMask") {
-      try {
-        setError(null);
-        await connectWallet();
-        onOpenChange(false);
-      } catch (error) {
-        console.error("Failed to connect to wallet:", error);
+  const handleConnect = async (walletId: string) => {
+    try {
+      setError(null);
+      // Verificar si el conector está disponible
+      const isConnectorAvailable = connectors.some(c => c.type === walletId);
+      
+      if (!isConnectorAvailable) {
+        console.error(`Conector para ${walletId} no encontrado`);
         setError(t('wallet_connection_failed'));
+        return;
       }
-    } else {
-      // For other wallets, just close the modal for now
-      // (future integration point)
+      
+      await connectWallet(walletId);
       onOpenChange(false);
+    } catch (error) {
+      console.error("Failed to connect to wallet:", error);
+      setError(t('wallet_connection_failed'));
     }
   };
 
@@ -67,7 +59,7 @@ const WalletModal = ({ open, onOpenChange }: WalletModalProps) => {
             <button
               key={wallet.name}
               className="flex items-center gap-4 p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-              onClick={() => handleConnect(wallet.name)}
+              onClick={() => handleConnect(wallet.id)}
               disabled={isConnecting}
             >
               <img

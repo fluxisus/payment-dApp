@@ -10,14 +10,20 @@ export function useWallet() {
   const { toast } = useToast();
   const { t } = useLanguage();
 
-  const connector = connectors[0]; // MetaMask connector
-
-  const connectWallet = async () => {
+  const connectWallet = async (connectorId?: string) => {
     try {
+      let connector;
+
+      if (connectorId) {
+        connector = connectors.find((c) => c.type === connectorId);
+      } else {
+        connector = connectors[0];
+      }
+
       if (!connector) {
         toast({
-          title: t("metamask_not_available"),
-          description: t("metamask_not_available_desc"),
+          title: t("wallet_not_available"),
+          description: t("wallet_not_available_desc"),
           variant: "destructive",
         });
         return;
@@ -68,5 +74,6 @@ export function useWallet() {
     switchNetwork,
     chains,
     isConnecting: isPending,
+    connectors,
   };
 }

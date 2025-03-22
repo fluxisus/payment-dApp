@@ -66,7 +66,10 @@ export const es = {
   wallet_connection_error: "Error de Conexión de Billetera",
   metamask_not_available: "MetaMask No Disponible",
   metamask_not_available_desc:
-    "Por favor, instala la extensión MetaMask o usa la aplicación móvil de MetaMask",
+    "Por favor, instala la extensión de MetaMask o usa otra billetera compatible.",
+  wallet_not_available: "Billetera No Disponible",
+  wallet_not_available_desc:
+    "La billetera seleccionada no está disponible. Por favor, instala la extensión o aplicación correspondiente.",
   qr_code_generated: "Código QR Generado",
   qr_code_copied: "Código QR Copiado",
   qr_code_error: "Error en el Código QR",
@@ -139,7 +142,7 @@ export const es = {
   goerli: "Goerli (Testnet)",
   mumbai: "Mumbai (Testnet)",
   sepolia: "Sepolia (Testnet)",
-  unknown_network: "la red seleccionada",
+  unknown_network: "Red Desconocida",
   network_with_id: "Red {id}",
 
   // Charge modal

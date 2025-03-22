@@ -14,8 +14,8 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { 
   isTokenSupportedOnNetwork,
   type TokenSymbol,
-  NETWORKS,
-  TOKEN_METADATA
+  TOKEN_METADATA,
+  getNetworkTranslationKey
 } from "@/lib/networks";
 
 const Index = () => {
@@ -92,10 +92,8 @@ const Index = () => {
   };
 
   // Get network name based on chainId
-  const getNetworkName = () => {
-    const networkKey = chainId === 1 ? 'ethereum' : 
-                      chainId === 137 ? 'polygon' : 
-                      chainId === 56 ? 'bsc' : 'unknown_network';
+  const getNetworkName = (chainId: number) => {
+    const networkKey = getNetworkTranslationKey(chainId);
     return t(networkKey);
   };
 
@@ -153,7 +151,7 @@ const Index = () => {
           <h2 className="text-xl font-semibold mb-4">{t('balance')}</h2>
           {supportedTokens.length === 0 ? (
             <div className="p-4 bg-white/5 rounded-xl text-center py-4 text-crypto-text-secondary">
-              {t('no_supported_tokens', { network: getNetworkName() })}
+              {t('no_supported_tokens', { network: getNetworkName(chainId) })}
             </div>
           ) : (
             <div className="flex flex-col gap-4">

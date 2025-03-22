@@ -4,8 +4,6 @@ import {
   isTokenSupportedOnNetwork,
   getTokenAddress,
   type TokenSymbol,
-  type NaspipNetwork,
-  NETWORKS,
 } from "@/lib/networks";
 
 // ERC20 Transfer event interface

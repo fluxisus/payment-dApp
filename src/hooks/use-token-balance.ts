@@ -4,7 +4,6 @@ import { formatUnits } from "viem";
 import {
   isTokenSupportedOnNetwork,
   getTokenAddress,
-  TOKEN_ADDRESSES,
   type TokenSymbol,
 } from "@/lib/networks";
 

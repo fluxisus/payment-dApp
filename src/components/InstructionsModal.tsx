@@ -1,9 +1,10 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Link } from "lucide-react";
+import { Copy } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
 
 interface InstructionsModalProps {
   open: boolean;
@@ -14,10 +15,17 @@ interface InstructionsModalProps {
 const InstructionsModal = ({ open, onOpenChange, qrData }: InstructionsModalProps) => {
   const { t } = useLanguage();
   const { toast } = useToast();
+  const [showCopiedTooltip, setShowCopiedTooltip] = useState(false);
 
   const handleCopyLink = async () => {
     try {
       await navigator.clipboard.writeText(qrData);
+      // Mostrar tooltip
+      setShowCopiedTooltip(true);
+      // Ocultar después de 2 segundos
+      setTimeout(() => {
+        setShowCopiedTooltip(false);
+      }, 2000);
     } catch (err) {
       console.error('Failed to copy:', err);
       toast({
@@ -89,14 +97,24 @@ const InstructionsModal = ({ open, onOpenChange, qrData }: InstructionsModalProp
               />
             </Button>
 
-            <Button
-              variant="outline"
-              size="icon"
-              className="w-12 h-12 p-2 hover:bg-white/10 transition-colors group"
-              onClick={handleCopyLink}
-            >
-              <Link className="w-full h-full text-gray-800 dark:text-white/80 group-hover:text-gray-900 dark:group-hover:text-white transition-colors" />
-            </Button>
+            <div className="relative">
+              <Button
+                variant="outline"
+                size="icon"
+                className="w-12 h-12 p-2 hover:bg-white/10 transition-colors group"
+                onClick={handleCopyLink}
+              >
+                <Copy className="w-full h-full text-gray-800 dark:text-white/80 group-hover:text-gray-900 dark:group-hover:text-white transition-colors" />
+              </Button>
+              
+              {/* Tooltip */}
+              {showCopiedTooltip && (
+                <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 px-3 py-1 bg-gray-800 text-white text-xs rounded-md">
+                  {t('link_copied')}
+                  <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-gray-800 rotate-45"></div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </DialogContent>

@@ -4,24 +4,85 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AlertCircle } from "lucide-react";
 import { useWallet } from "@/hooks/use-wallet";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { WALLETS } from "@/lib/networks";
+
 interface WalletModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+}
+
+// Definir tipo para window.ethereum con isTrust
+declare global {
+  interface Window {
+    ethereum?: {
+      isTrust?: boolean;
+      [key: string]: unknown;
+    };
+  }
+}
+
+// Agregar tipo para operaMini
+interface Navigator {
+  vendor: string;
+  opera?: unknown;
 }
 
 const WalletModal = ({ open, onOpenChange }: WalletModalProps) => {
   const { connectWallet, isConnecting, connectors } = useWallet();
   const { t } = useLanguage();
   const [error, setError] = useState<string | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
+  
+  // Detectar si estamos en un dispositivo móvil
+  useEffect(() => {
+    const checkIfMobile = () => {
+      const userAgent = navigator.userAgent || navigator.vendor || ((window as unknown) as Navigator).opera;
+      const isMobileDevice = /android|webos|iphone|ipad|ipod|blackberry|windows phone/i.test(
+        typeof userAgent === 'string' ? userAgent : ''
+      );
+      setIsMobile(isMobileDevice);
+    };
+    
+    checkIfMobile();
+  }, [isMobile]);
+  
+  // Verifica si Trust Wallet está disponible
+  const isTrustWalletAvailable = (): boolean => {
+    if (typeof window === 'undefined') return false;
+    
+    const ethereum = window.ethereum;
+    if (!ethereum) return false;
+    
+    // Detectar Trust Wallet
+    // Trust Wallet agrega 'isTrust' a ethereum
+    return !!ethereum.isTrust;
+  };
 
   const handleConnect = async (walletId: string) => {
     try {
       setError(null);
+      
+      // Verificaciones específicas para Trust Wallet
+      if (walletId === 'injected') {
+        if (isMobile && !isTrustWalletAvailable()) {
+          // En móvil pero Trust Wallet no está instalado
+          // Redirigir a la app store o deeplink
+          if (confirm(t('install_trust_wallet_prompt'))) {
+            const isAndroid = /android/i.test(navigator.userAgent);
+            if (isAndroid) {
+              window.open('https://play.google.com/store/apps/details?id=com.wallet.crypto.trustapp', '_blank');
+            } else {
+              window.open('https://apps.apple.com/app/apple-store/id1288339409', '_blank');
+            }
+            return;
+          }
+        }
+      }
+      
       // Verificar si el conector está disponible
       const isConnectorAvailable = connectors.some(c => c.type === walletId);
       

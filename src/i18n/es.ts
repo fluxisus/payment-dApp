@@ -73,6 +73,7 @@ export const es = {
   qr_code_generated: "Código QR Generado",
   qr_code_copied: "Código QR Copiado",
   qr_code_error: "Error en el Código QR",
+  qr_code_generation_error: "Error al Generar el Código QR",
   payment_processing: "Procesando Pago",
   payment_success: "Pago Exitoso",
   payment_error: "Error en el Pago",
@@ -83,7 +84,7 @@ export const es = {
   scanning_qr: "Escaneando código QR...",
   loading_camera: "Cargando cámara...",
   payment_details: "Detalles del Pago:",
-  id: "ID:",
+  charge_id: "ID de Pago:",
   amount: "Cantidad:",
   network: "Red:",
   address: "Dirección:",
@@ -101,7 +102,7 @@ export const es = {
   merchant_information: "Información del Comerciante",
   tax_id: "ID fiscal:",
   from: "Desde:",
-  identifier: "Identificador: {id}",
+  identifier: "ID de Pago: {id}",
   unit_price: "Precio unitario:",
   quantity: "Cantidad:",
   payment_amount: "Monto del Pago:",
@@ -147,7 +148,7 @@ export const es = {
 
   // Charge modal
   additional_details: "Detalles Adicionales",
-  description: "Descripción",
+  payment_description: "Descripción del Pago",
   enter_description: "Ingrese descripción",
   merchant_name: "Nombre del Comerciante",
   enter_merchant_name: "Ingrese nombre del comerciante",
@@ -163,4 +164,8 @@ export const es = {
   share_instructions: "Compartir Instrucciones",
   link_copied: "Enlace copiado al portapapeles",
   copy_failed: "Error al copiar el enlace",
+
+  // Trust Wallet específico
+  install_trust_wallet_prompt:
+    "Trust Wallet no está instalado. ¿Deseas instalar Trust Wallet?",
 };

@@ -66,7 +66,6 @@ export const Header = () => {
   const handleNetworkChange = (value: string) => {
     // Store the selected network value
     setSelectedNetwork(value);
-    console.log(value);
     
     // If connected, also switch the network in the wallet
     if (isConnected) {

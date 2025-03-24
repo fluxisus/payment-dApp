@@ -40,6 +40,39 @@ export interface QrReadResponse {
   purpose: string;
 }
 
+export interface QrTokenRequest {
+  payment: {
+    id: string;
+    address: string;
+    address_tag?: string;
+    unique_asset_id: string;
+    is_open?: boolean;
+    amount?: string;
+    min_amount?: string;
+    max_amount?: string;
+    expires_at: number;
+  };
+  order?: {
+    total?: string;
+    coin_code?: string;
+    description?: string;
+    merchant?: {
+      name: string;
+      description?: string;
+      tax_id?: string;
+      image?: string;
+      mcc?: string;
+    };
+    items?: Array<{
+      description?: string;
+      amount?: string;
+      unit_price?: string;
+      quantity?: number;
+      coin_code?: string;
+    }>;
+  };
+}
+
 /**
  * Read a NASPIP token from a QR code
  * @param token The NASPIP token to read
@@ -85,8 +118,8 @@ export async function readQrToken(
  * @returns The generated token or null if generation failed
  */
 export async function generateQrToken(
-  paymentData: any,
-): Promise<string | null> {
+  paymentData: QrTokenRequest,
+): Promise<{ ok: boolean; data: string; error?: string }> {
   try {
     const response = await fetch(`${BACKEND_API_BASE_URL}/public/qr/create`, {
       method: "POST",
@@ -99,19 +132,13 @@ export async function generateQrToken(
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       console.error("Error generating QR token:", errorData);
-      throw new Error(errorData.message || "Failed to generate QR token");
+      return { ok: false, data: "", error: "Failed to generate QR token" };
     }
 
     const data = await response.json();
-    return data.token;
+    return { ok: true, data: data.token };
   } catch (error) {
     console.error("Error generating QR token:", error);
-    toast({
-      title: "Error Generating QR Code",
-      description:
-        error instanceof Error ? error.message : "Failed to generate QR code",
-      variant: "destructive",
-    });
-    return null;
+    return { ok: false, data: "", error: "Failed to generate QR code" };
   }
 }

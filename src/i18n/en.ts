@@ -72,17 +72,22 @@ export const en = {
   qr_code_generated: "QR Code Generated",
   qr_code_copied: "QR Code Copied",
   qr_code_error: "QR Code Error",
+  qr_code_generation_error: "Error Generating QR Code",
   payment_processing: "Payment Processing",
   payment_success: "Payment Success",
   payment_error: "Payment Error",
   charge_created: "Charge Created",
   charge_error: "Charge Error",
 
+  // Trust Wallet specific
+  install_trust_wallet_prompt:
+    "Trust Wallet is not installed. Would you like to install Trust Wallet?",
+
   // Pay modal
   scanning_qr: "Scanning QR code...",
   loading_camera: "Loading camera...",
   payment_details: "Payment Details:",
-  id: "ID:",
+  payment_id: "Payment ID:",
   amount: "Amount:",
   network: "Network:",
   address: "Address:",
@@ -100,7 +105,7 @@ export const en = {
   merchant_information: "Merchant Information",
   tax_id: "Tax id:",
   from: "From:",
-  identifier: "Identifier: {id}",
+  identifier: "Payment ID: {id}",
   unit_price: "Unit price:",
   quantity: "Quantity:",
   payment_amount: "Payment Amount:",
@@ -145,7 +150,7 @@ export const en = {
 
   // Charge modal
   additional_details: "Additional Details",
-  description: "Description",
+  payment_description: "Charge Description",
   enter_description: "Enter description",
   merchant_name: "Merchant Name",
   enter_merchant_name: "Enter merchant name",

@@ -1,4 +1,9 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { AlertCircle, Loader2, ExternalLink } from "lucide-react";
 import { useState, useEffect } from "react";
 import { QrReadResponse } from "@/lib/api";
@@ -9,6 +14,7 @@ import { ProceedToPaymentButton } from "@/components/ProceedToPaymentButton";
 import { useSimulateContract, useWriteContract } from "wagmi";
 import { parseUnits } from "viem";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 // ERC20 ABI with transfer function
 const erc20ABI = [
@@ -45,11 +51,19 @@ interface OrderModalProps {
   isLoading: boolean;
 }
 
-const OrderModal = ({ open, onOpenChange, paymentData, isLoading }: OrderModalProps) => {
+const OrderModal = ({
+  open,
+  onOpenChange,
+  paymentData,
+  isLoading,
+}: OrderModalProps) => {
   const { chainId, switchNetwork } = useWallet();
-  const [paymentInfo, setPaymentInfo] = useState<ReturnType<typeof extractPaymentInfo> | null>(null);
+  const [paymentInfo, setPaymentInfo] = useState<ReturnType<
+    typeof extractPaymentInfo
+  > | null>(null);
   const [networkMismatch, setNetworkMismatch] = useState(false);
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [paymentInitiated, setPaymentInitiated] = useState(false);
   const [transferArgs, setTransferArgs] = useState<{
     address: `0x${string}`;
@@ -70,7 +84,7 @@ const OrderModal = ({ open, onOpenChange, paymentData, isLoading }: OrderModalPr
     if (paymentData) {
       const info = extractPaymentInfo(paymentData);
       setPaymentInfo(info);
-      
+
       // Check for network mismatch
       if (info.networkId && chainId) {
         setNetworkMismatch(info.networkId !== chainId);
@@ -101,7 +115,7 @@ const OrderModal = ({ open, onOpenChange, paymentData, isLoading }: OrderModalPr
 
   const handleSwitchNetwork = async () => {
     if (!paymentInfo || !paymentInfo.networkId || !switchNetwork) return;
-    
+
     try {
       await switchNetwork(paymentInfo.networkId);
     } catch (error) {
@@ -118,7 +132,7 @@ const OrderModal = ({ open, onOpenChange, paymentData, isLoading }: OrderModalPr
   const { data: simulateData } = useSimulateContract({
     address: transferArgs?.address,
     abi: erc20ABI,
-    functionName: 'transfer',
+    functionName: "transfer",
     args: transferArgs?.args,
     query: {
       enabled: !!transferArgs,
@@ -126,11 +140,16 @@ const OrderModal = ({ open, onOpenChange, paymentData, isLoading }: OrderModalPr
   });
 
   // Setup the write contract hook for token transfer
-  const { writeContract, isPending: isWritePending, isError: isWriteError, error: writeError } = useWriteContract();
+  const {
+    writeContract,
+    isPending: isWritePending,
+    isError: isWriteError,
+    error: writeError,
+  } = useWriteContract();
 
   const handleProceedToPayment = async () => {
     if (!paymentInfo) return;
-    
+
     try {
       // Get the token address from the payment info
       const tokenAddress = paymentInfo.tokenAddress as `0x${string}`;
@@ -162,7 +181,8 @@ const OrderModal = ({ open, onOpenChange, paymentData, isLoading }: OrderModalPr
       console.error("Error processing payment:", error);
       toast({
         title: "Payment Failed",
-        description: error instanceof Error ? error.message : "Failed to process payment",
+        description:
+          error instanceof Error ? error.message : "Failed to process payment",
         variant: "destructive",
       });
     }
@@ -177,7 +197,10 @@ const OrderModal = ({ open, onOpenChange, paymentData, isLoading }: OrderModalPr
         console.error("Error sending transaction:", error);
         toast({
           title: "Transaction Failed",
-          description: error instanceof Error ? error.message : "Failed to send transaction",
+          description:
+            error instanceof Error
+              ? error.message
+              : "Failed to send transaction",
           variant: "destructive",
         });
       }
@@ -185,21 +208,32 @@ const OrderModal = ({ open, onOpenChange, paymentData, isLoading }: OrderModalPr
   }, [simulateData, paymentInitiated, writeContract, toast]);
 
   // Get network name from network ID
-  const getNetworkName = (networkId: number | null) => {
+  const getNetworkName = (networkId?: number) => {
     if (!networkId) return "Unknown";
-    
+
     switch (networkId) {
-      case 1: return "Ethereum";
-      case 56: return "BNB Smart Chain";
-      case 137: return "Polygon";
-      case 42161: return "Arbitrum";
-      case 10: return "Optimism";
-      case 43114: return "Avalanche";
-      case 8453: return "Base";
-      case 5: return "Goerli (Testnet)";
-      case 80001: return "Mumbai (Testnet)";
-      case 11155111: return "Sepolia (Testnet)";
-      default: return `Network ${networkId}`;
+      case 1:
+        return "Ethereum";
+      case 56:
+        return "BNB Smart Chain";
+      case 137:
+        return "Polygon";
+      case 42161:
+        return "Arbitrum";
+      case 10:
+        return "Optimism";
+      case 43114:
+        return "Avalanche";
+      case 8453:
+        return "Base";
+      case 5:
+        return "Goerli (Testnet)";
+      case 80001:
+        return "Mumbai (Testnet)";
+      case 11155111:
+        return "Sepolia (Testnet)";
+      default:
+        return `Network ${networkId}`;
     }
   };
 
@@ -207,7 +241,7 @@ const OrderModal = ({ open, onOpenChange, paymentData, isLoading }: OrderModalPr
   const isValidUrl = (urlString: string): boolean => {
     try {
       const url = new URL(urlString);
-      return url.protocol === 'http:' || url.protocol === 'https:';
+      return url.protocol === "http:" || url.protocol === "https:";
     } catch (e) {
       return false;
     }
@@ -215,31 +249,36 @@ const OrderModal = ({ open, onOpenChange, paymentData, isLoading }: OrderModalPr
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className={cn(
-        "glass-card border-crypto-border sm:max-w-md overflow-visible",
-        "order-modal" // Custom class for targeting in CSS
-      )}>
+      <DialogContent
+        className={cn(
+          "glass-card border-crypto-border sm:max-w-md overflow-visible",
+          "order-modal", // Custom class for targeting in CSS
+        )}
+      >
         <DialogHeader className="flex flex-row items-center justify-between">
           <DialogTitle className="text-xl font-semibold">
-            Order Details
+            {t("order_details")}
           </DialogTitle>
         </DialogHeader>
-        
+
         <div className="py-4 space-y-4">
           {isLoading ? (
             <div className="flex flex-col items-center justify-center h-40 space-y-3">
               <Loader2 className="w-8 h-8 animate-spin text-crypto-primary" />
-              <p className="text-crypto-text-secondary">Loading order details...</p>
+              <p className="text-crypto-text-secondary">{t("loading_order")}</p>
             </div>
           ) : paymentInfo && paymentData ? (
             <>
               {/* Network mismatch warning */}
-              {networkMismatch && (
+              {networkMismatch ? (
                 <div className="p-3 bg-yellow-500/20 border border-yellow-500/50 rounded-lg text-sm flex items-start gap-2">
                   <AlertCircle className="w-4 h-4 text-yellow-500 mt-0.5 flex-shrink-0" />
                   <div>
-                    <p>Network mismatch. This payment requires {getNetworkName(paymentInfo.networkId)}.</p>
-                    <button 
+                    <p>
+                      Network mismatch. This payment requires{" "}
+                      {getNetworkName(paymentInfo.networkId)}.
+                    </p>
+                    <button
                       onClick={handleSwitchNetwork}
                       className="text-yellow-400 hover:text-yellow-300 font-medium mt-1"
                     >
@@ -247,84 +286,92 @@ const OrderModal = ({ open, onOpenChange, paymentData, isLoading }: OrderModalPr
                     </button>
                   </div>
                 </div>
-              )}
-              
+              ) : null}
+
               {/* Merchant Information */}
-              <div className="space-y-2">
-                <h3 className="font-medium text-lg">Merchant Information</h3>
-                <div className="p-4 bg-white/5 rounded-xl space-y-2">
-                  {paymentInfo.order?.merchant && (
-                    <>
-                      <p className="font-medium">{paymentInfo.order.merchant.name}</p>
-                      <p className="text-sm">{paymentInfo.order.merchant.description}</p>
-                      <p className="text-xs text-crypto-text-secondary">Tax id: {paymentInfo.order.merchant.tax_id}</p>
-                    </>
-                  )}
-                  <div className="text-xs text-crypto-text-secondary mt-2">
-                    From: {
-                      isValidUrl(paymentData.payload.iss) ? (
-                        <a 
-                          href={paymentData.payload.iss} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-crypto-accent hover:text-crypto-accent-hover hover:underline inline-flex items-center"
-                        >
-                          {paymentData.payload.iss}
-                          <ExternalLink className="ml-1 w-3 h-3" />
-                        </a>
-                      ) : (
-                        paymentData.payload.iss
-                      )
-                    }
+              {paymentInfo.order?.merchant?.name ? (
+                <div className="space-y-2">
+                  <h3 className="font-medium text-lg">
+                    {t("merchant_information")}
+                  </h3>
+                  <div className="p-4 bg-white/5 rounded-xl space-y-2">
+                    <p className="font-medium">
+                      {paymentInfo.order.merchant.name}
+                    </p>
+                    <p className="text-sm">
+                      {paymentInfo.order.merchant.description}
+                    </p>
+                    {paymentInfo.order.merchant.tax_id ? (
+                      <p className="text-xs text-crypto-text-secondary">
+                        {t("tax_id")}: {paymentInfo.order.merchant.tax_id}
+                      </p>
+                    ) : null}
                   </div>
                 </div>
-              </div>
-              
+              ) : null}
+
+              {/* Order Items - Only this section is scrollable */}
+              {(paymentInfo.order?.items ?? []).length > 0 ? (
+                    <div className="p-4 bg-white/5 rounded-xl space-y-3 max-h-60 overflow-y-auto">
+                      {paymentInfo.order.items.map((item, index) => (
+                        <div
+                          key={index}
+                          className="border-b border-white/10 pb-2 last:border-0 last:pb-0"
+                        >
+                          <div className="flex justify-between">
+                            <p className="font-medium">{item.description}</p>
+                            <p>
+                              {item.amount} {item.coin_code}
+                            </p>
+                          </div>
+                          <div className="flex justify-between text-sm text-crypto-text-secondary">
+                            <p>Unit price: {item.unit_price}</p>
+                            <p>Quantity: {item.quantity}</p>
+                          </div>
+                        </div>
+                      ))}
+
+                      {/* Order Total */}
+                      <div className="flex justify-between pt-2 font-medium border-t border-white/20">
+                        <p>Total</p>
+                        <p>
+                          {paymentInfo.order.coinCode}{" "}
+                          {paymentInfo.order.totalAmount}
+                        </p>
+                      </div>
+                    </div>
+                  ) : null}
+
+
               {/* Order Information */}
               <div className="space-y-2">
-                <h3 className="font-medium text-lg">Identifier: {paymentInfo.id}</h3>
-                
-                {/* Order Items - Only this section is scrollable */}
-                {paymentInfo.order?.items && paymentInfo.order.items.length > 0 && (
-                  <div className="p-4 bg-white/5 rounded-xl space-y-3 max-h-60 overflow-y-auto">
-                    {paymentInfo.order.items.map((item, index) => (
-                      <div key={index} className="border-b border-white/10 pb-2 last:border-0 last:pb-0">
-                        <div className="flex justify-between">
-                          <p className="font-medium">{item.description}</p>
-                          <p>{item.amount} {item.coin_code}</p>
-                        </div>
-                        <div className="flex justify-between text-sm text-crypto-text-secondary">
-                          <p>Unit price: {item.unit_price}</p>
-                          <p>Quantity: {item.quantity}</p>
-                        </div>
-                      </div>
-                    ))}
-                    
-                    {/* Order Total */}
-                    <div className="flex justify-between pt-2 font-medium border-t border-white/20">
-                      <p>Total</p>
-                      <p>{paymentInfo.order.coinCode} {paymentInfo.order.totalAmount}</p>
-                    </div>
-                  </div>
-                )}
-                
+                <h3 className="font-medium text-lg">
+                  {t("identifier", { id: paymentInfo.id })}
+                </h3>
+
                 {/* Payment Details */}
                 <div className="p-4 bg-white/5 rounded-xl space-y-1 text-sm">
                   <div className="flex justify-between">
-                    <p className="text-crypto-text-secondary">Payment Amount:</p>
+                    <p className="text-crypto-text-secondary">
+                      {t("payment_amount")}:
+                    </p>
                     <p>{paymentInfo.amount}</p>
                   </div>
                   <div className="flex justify-between">
-                    <p className="text-crypto-text-secondary">Network:</p>
+                    <p className="text-crypto-text-secondary">
+                      {t("network")}:
+                    </p>
                     <p>{getNetworkName(paymentInfo.networkId)}</p>
                   </div>
                   <div className="space-y-1">
-                    <p className="text-crypto-text-secondary">Recipient:</p>
+                    <p className="text-crypto-text-secondary">
+                      {t("address")}:
+                    </p>
                     <p className="break-all">{paymentInfo.address}</p>
                   </div>
                 </div>
               </div>
-              
+
               {/* Transaction Status */}
               {paymentInitiated && (
                 <div className="p-4 bg-white/5 rounded-xl space-y-2">
@@ -332,34 +379,43 @@ const OrderModal = ({ open, onOpenChange, paymentData, isLoading }: OrderModalPr
                   <div className="text-sm space-y-1">
                     <div className="flex justify-between">
                       <p className="text-crypto-text-secondary">Status:</p>
-                      {isWritePending && <p className="text-yellow-400">Processing...</p>}
-                      {!isWritePending && !isWriteError && <p className="text-green-400">Submitted</p>}
+                      {isWritePending && (
+                        <p className="text-yellow-400">Processing...</p>
+                      )}
+                      {!isWritePending && !isWriteError && (
+                        <p className="text-green-400">Submitted</p>
+                      )}
                     </div>
                   </div>
                 </div>
               )}
-              
+
               {/* Error Message */}
               {isWriteError && (
                 <div className="p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-sm flex items-start gap-2">
                   <AlertCircle className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" />
                   <div>
-                    <p>Transaction failed: {writeError?.message || "Unknown error"}</p>
+                    <p>
+                      Transaction failed:{" "}
+                      {writeError?.message || "Unknown error"}
+                    </p>
                   </div>
                 </div>
               )}
-              
+
               {/* Payment Button */}
               {!paymentInitiated && (
-                <ProceedToPaymentButton 
-                  networkMismatch={networkMismatch} 
-                  onClick={handleProceedToPayment} 
+                <ProceedToPaymentButton
+                  networkMismatch={networkMismatch}
+                  onClick={handleProceedToPayment}
                 />
               )}
             </>
           ) : (
             <div className="flex items-center justify-center h-40">
-              <p className="text-crypto-text-secondary">No order information available</p>
+              <p className="text-crypto-text-secondary">
+                No order information available
+              </p>
             </div>
           )}
         </div>
@@ -368,4 +424,4 @@ const OrderModal = ({ open, onOpenChange, paymentData, isLoading }: OrderModalPr
   );
 };
 
-export default OrderModal; 
+export default OrderModal;

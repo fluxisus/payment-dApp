@@ -8,7 +8,7 @@ import { useWallet } from "@/hooks/use-wallet";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
-import { BACKEND_API_BASE_URL } from "@/lib/constants";
+import { v4 as uuidv4 } from 'uuid';
 import { 
   getNaspipNetwork, 
   getNetworkTranslationKey, 
@@ -17,6 +17,7 @@ import {
   type TokenSymbol 
 } from "@/lib/networks";
 import InstructionsModal from "./InstructionsModal";
+import { generateQrToken } from "@/lib/api";
 
 interface ChargeModalProps {
   open: boolean;
@@ -78,9 +79,7 @@ const ChargeModal = ({ open, onOpenChange }: ChargeModalProps) => {
   ];
 
   // Check if required fields are filled
-  const isFormValid = formData.id.trim() !== "" && 
-                     formData.amount.trim() !== "" && 
-                     formData.address.trim() !== "";
+  const isFormValid = formData.amount.trim() !== "" && formData.address.trim() !== "";
 
   const handleCreatePayment = async () => {
     if (!isConnected) {
@@ -123,47 +122,41 @@ const ChargeModal = ({ open, onOpenChange }: ChargeModalProps) => {
       const unique_asset_id = `n${naspipNetwork}_t${tokenAddress}`;
 
       // Prepare the request body
+      const order = formData.merchantName || formData.merchantDescription || formData.merchantTaxId ? {
+        total: formData.amount,
+        coin_code: formData.token,
+        merchant: {
+          name: formData.merchantName,
+          description: formData.merchantDescription,
+          tax_id: formData.merchantTaxId
+        },
+        items: []
+      } : undefined;
+
       const requestBody = {
         payment: {
-          id: formData.id,
+          id: formData.id.trim() || uuidv4(),
           address: formData.address,
           unique_asset_id,
           is_open: false,
           amount: formData.amount,
           expires_at: expiresAt
         },
-        ...(formData.merchantName || formData.merchantDescription || formData.merchantTaxId ? {
-          order: {
-            total: formData.amount,
-            coin_code: formData.token,
-            merchant: {
-              name: formData.merchantName,
-              description: formData.merchantDescription,
-              tax_id: formData.merchantTaxId
-            },
-            items: []
-          }
-        } : {})
+        order
       };
 
-      const response = await fetch(`${BACKEND_API_BASE_URL}/public/qr/create`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestBody)
-      });
+      const response = await generateQrToken(requestBody);
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => null);
-        throw new Error(errorData?.message || 'Failed to create payment instructions');
+        toast({
+          title: t('qr_code_generation_error'),
+          variant: "destructive",
+        });
       }
-
-      const data = await response.json();
       
       // Set QR data and show instructions modal
-      setQrData(data.token);
-      setShowInstructions(true);
+      setQrData(response.data);
+      setShowInstructions(response.ok);
       
       // Close the charge modal
       onOpenChange(false);
@@ -221,7 +214,7 @@ const ChargeModal = ({ open, onOpenChange }: ChargeModalProps) => {
               {/* ID and Amount Inputs */}
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="id">{t('id')}</Label>
+                  <Label htmlFor="id">{t('payment_id')}</Label>
                   <Input
                     id="id"
                     value={formData.id}
@@ -304,7 +297,7 @@ const ChargeModal = ({ open, onOpenChange }: ChargeModalProps) => {
                         value={formData.description}
                         onChange={e => setFormData(prev => ({ ...prev, description: e.target.value }))}
                         className="bg-white/5"
-                        placeholder={t('description')}
+                        placeholder={t('payment_description')}
                       />
                     </div>
 

@@ -1,12 +1,8 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Camera, QrCode, AlertCircle } from "lucide-react";
+import { Camera, QrCode } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useState, useRef, useEffect } from "react";
-import { QrReadResponse } from "@/lib/api";
-import { extractPaymentInfo } from "@/lib/utils";
-import { useWallet } from "@/hooks/use-wallet";
 import jsQR from "jsqr";
-import { ProceedToPaymentButton } from "@/components/ProceedToPaymentButton";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 interface PayModalProps {
@@ -18,19 +14,15 @@ interface PayModalProps {
 const PayModal = ({ open, onOpenChange, onTokenDetected }: PayModalProps) => {
   const { toast } = useToast();
   const { t } = useLanguage();
-  const { chainId, switchNetwork } = useWallet();
   const [showCamera, setShowCamera] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const scanIntervalRef = useRef<number | null>(null);
   const [cameraReady, setCameraReady] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [paymentData, setPaymentData] = useState<QrReadResponse | null>(null);
-  const [paymentInfo, setPaymentInfo] = useState<ReturnType<typeof extractPaymentInfo> | null>(null);
-  const [networkMismatch, setNetworkMismatch] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false); 
   const [clipboardPermissionDenied, setClipboardPermissionDenied] = useState(false);
-
+ 
   // Reset state when modal is opened
   useEffect(() => {
     if (open) {
@@ -85,13 +77,6 @@ const PayModal = ({ open, onOpenChange, onTokenDetected }: PayModalProps) => {
       }
     }
   }, [open]);
-
-  // Check for network mismatch when payment info or chain ID changes
-  useEffect(() => {
-    if (paymentInfo && paymentInfo.networkId && chainId) {
-      setNetworkMismatch(paymentInfo.networkId !== chainId);
-    }
-  }, [paymentInfo, chainId]);
 
   // This effect handles setting up the video element when showCamera changes
   useEffect(() => {
@@ -196,8 +181,8 @@ const PayModal = ({ open, onOpenChange, onTokenDetected }: PayModalProps) => {
       }
 
       // Get available video devices
-      const devices = await navigator.mediaDevices.enumerateDevices();
-      const videoDevices = devices.filter(device => device.kind === 'videoinput');
+      // const devices = await navigator.mediaDevices.enumerateDevices();
+      // const videoDevices = devices.filter(device => device.kind === 'videoinput');
 
       // Simple camera request - don't set srcObject here
       const stream = await navigator.mediaDevices.getUserMedia({ 
@@ -299,43 +284,6 @@ const PayModal = ({ open, onOpenChange, onTokenDetected }: PayModalProps) => {
     }
   };
 
-  const handleSwitchNetwork = async () => {
-    if (paymentInfo?.networkId && switchNetwork) {
-      try {
-        await switchNetwork(paymentInfo.networkId);
-      } catch (error) {
-        console.error("Error switching network:", error);
-        toast({
-          title: "Network Switch Failed",
-          description: "Failed to switch to the required network",
-          variant: "destructive"
-        });
-      }
-    }
-  };
-
-  const handleProceedToPayment = async () => {
-    // Payment logic will be implemented here
-  };
-
-  const getNetworkName = (networkId: number | null) => {
-    if (!networkId) return t('unknown_network');
-    
-    switch (networkId) {
-      case 1: return "Ethereum";
-      case 56: return "BNB Smart Chain";
-      case 137: return "Polygon";
-      case 42161: return "Arbitrum";
-      case 10: return "Optimism";
-      case 43114: return "Avalanche";
-      case 8453: return "Base";
-      case 5: return "Goerli (Testnet)";
-      case 80001: return "Mumbai (Testnet)";
-      case 11155111: return "Sepolia (Testnet)";
-      default: return `Network ${networkId}`;
-    }
-  };
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="glass-card border-crypto-border sm:max-w-md">
@@ -345,7 +293,7 @@ const PayModal = ({ open, onOpenChange, onTokenDetected }: PayModalProps) => {
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-4">
-          {showCamera && (
+          {showCamera ? (
             <div className="relative w-full aspect-square bg-black rounded-xl overflow-hidden mb-4">
               <video 
                 ref={videoRef} 
@@ -373,57 +321,7 @@ const PayModal = ({ open, onOpenChange, onTokenDetected }: PayModalProps) => {
                 </div>
               </div>
             </div>
-          )}
-          
-          {paymentData && paymentInfo && (
-            <div className="p-4 bg-white/5 rounded-xl space-y-4">
-              <h3 className="font-medium">{t('payment_details')}</h3>
-              <div className="grid grid-cols-2 gap-2 text-sm">
-                <span className="text-crypto-text-secondary">{t('id')}</span>
-                <span>{paymentInfo.id}</span>
-                
-                <span className="text-crypto-text-secondary">{t('amount')}</span>
-                <span>{paymentInfo.amount}</span>
-                
-                <span className="text-crypto-text-secondary">{t('network')}</span>
-                <span>{getNetworkName(paymentInfo.networkId)}</span>
-                
-                <span className="text-crypto-text-secondary">{t('address')}</span>
-                <span className="truncate">{paymentInfo.address}</span>
-                
-                {paymentInfo.order && (
-                  <>
-                    <span className="text-crypto-text-secondary">{t('merchant')}</span>
-                    <span>{paymentInfo.order.merchant.name}</span>
-                    
-                    <span className="text-crypto-text-secondary">{t('total')}</span>
-                    <span>{paymentInfo.order.totalAmount} {paymentInfo.order.coinCode}</span>
-                  </>
-                )}
-              </div>
-              
-              {networkMismatch && (
-                <div className="p-3 bg-yellow-500/20 border border-yellow-500/50 rounded-lg text-sm flex items-start gap-2">
-                  <AlertCircle className="w-4 h-4 text-yellow-500 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <p>{t('network_mismatch', { network: getNetworkName(paymentInfo.networkId) })}</p>
-                    <button 
-                      onClick={handleSwitchNetwork}
-                      className="text-yellow-400 hover:text-yellow-300 font-medium mt-1"
-                    >
-                      {t('switch_network')}
-                    </button>
-                  </div>
-                </div>
-              )}
-              
-              <ProceedToPaymentButton 
-                networkMismatch={networkMismatch} 
-                onClick={handleProceedToPayment} 
-              />
-            </div>
-          )}
-          
+          ) : null}
           <button
             onClick={handleScanClick}
             className="button-primary w-full"

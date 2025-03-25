@@ -162,7 +162,7 @@ export const es = {
   share_on_whatsapp: "Compartir en WhatsApp",
   share_on_telegram: "Compartir en Telegram",
   share_instructions: "Compartir Instrucciones",
-  link_copied: "Enlace copiado al portapapeles",
+  qr_naspip_copied: "Copiado!!",
   copy_failed: "Error al copiar el enlace",
 
   // Trust Wallet específico

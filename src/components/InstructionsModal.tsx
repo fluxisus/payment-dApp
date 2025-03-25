@@ -110,7 +110,7 @@ const InstructionsModal = ({ open, onOpenChange, qrData }: InstructionsModalProp
               {/* Tooltip */}
               {showCopiedTooltip && (
                 <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 px-3 py-1 bg-gray-800 text-white text-xs rounded-md">
-                  {t('link_copied')}
+                  {t('qr_naspip_copied')}
                   <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-gray-800 rotate-45"></div>
                 </div>
               )}

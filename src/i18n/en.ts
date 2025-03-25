@@ -164,6 +164,6 @@ export const en = {
   share_on_whatsapp: "Share on WhatsApp",
   share_on_telegram: "Share on Telegram",
   share_instructions: "Share Instructions",
-  link_copied: "Link copied to clipboard",
+  qr_naspip_copied: "Copied!!",
   copy_failed: "Failed to copy link",
 };

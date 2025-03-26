@@ -325,8 +325,8 @@ const OrderModal = ({
                             </p>
                           </div>
                           <div className="flex justify-between text-sm text-crypto-text-secondary">
-                            <p>Unit price: {item.unit_price}</p>
-                            <p>Quantity: {item.quantity}</p>
+                            <p>{t("unit_price")}: {item.unit_price}</p>
+                            <p>{t("quantity")}: {item.quantity}</p>
                           </div>
                         </div>
                       ))}

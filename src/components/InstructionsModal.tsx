@@ -50,9 +50,9 @@ const InstructionsModal = ({ open, onOpenChange, qrData }: InstructionsModalProp
           <div className="bg-white p-4 rounded-xl">
             <QRCodeSVG
               value={qrData}
-              size={256}
-              level="H"
-              includeMargin={true}
+              size={350}
+              level="L"
+              marginSize={2}
               className="w-full h-full"
               imageSettings={{
                 src: "/fluxis_icon.svg",

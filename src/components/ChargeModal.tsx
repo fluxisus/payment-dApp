@@ -123,6 +123,7 @@ const ChargeModal = ({ open, onOpenChange }: ChargeModalProps) => {
 
       // Prepare the request body
       const order = formData.merchantName || formData.merchantDescription || formData.merchantTaxId ? {
+        description: formData.description,
         total: formData.amount,
         coin_code: formData.token,
         merchant: {

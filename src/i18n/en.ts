@@ -102,7 +102,7 @@ export const en = {
   // Order modal
   order_details: "Order Details",
   loading_order: "Loading order details...",
-  merchant_information: "Merchant Information",
+  merchant_information: "Merchant",
   tax_id: "Tax id",
   from: "From",
   identifier: "Payment ID: {id}",

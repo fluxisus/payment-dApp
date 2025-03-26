@@ -13,6 +13,7 @@ export interface QrReadResponse {
         expires_at: number;
       };
       order?: {
+        description?: string;
         total: string;
         coin_code: string;
         merchant: {

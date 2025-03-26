@@ -99,7 +99,7 @@ export const es = {
   // Order modal
   order_details: "Detalles del Pedido",
   loading_order: "Cargando detalles del pedido...",
-  merchant_information: "Información del Comerciante",
+  merchant_information: "Comercio",
   tax_id: "ID fiscal",
   from: "Desde",
   identifier: "ID de Pago: {id}",

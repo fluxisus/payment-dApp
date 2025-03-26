@@ -63,11 +63,12 @@ export function extractPaymentInfo(response: QrReadResponse) {
     expiresAt: payment.expires_at,
     order: order
       ? {
+          description: order.description,
           totalAmount: order.total,
           coinCode: order.coin_code,
           merchant: order.merchant,
           items: order.items,
         }
-      : null,
+      : undefined,
   };
 }

@@ -288,6 +288,14 @@ const OrderModal = ({
                 </div>
               ) : null}
 
+              {paymentInfo.order?.description ? (
+                <div className="space-y-2">
+                  <h3 className="font-medium text-lg">
+                    {paymentInfo.order?.description}
+                  </h3>
+                </div>
+              ) : null}
+
               {/* Merchant Information */}
               {paymentInfo.order?.merchant?.name ? (
                 <div className="space-y-2">
@@ -312,36 +320,39 @@ const OrderModal = ({
 
               {/* Order Items - Only this section is scrollable */}
               {(paymentInfo.order?.items ?? []).length > 0 ? (
-                    <div className="p-4 bg-white/5 rounded-xl space-y-3 max-h-60 overflow-y-auto">
-                      {paymentInfo.order.items.map((item, index) => (
-                        <div
-                          key={index}
-                          className="border-b border-white/10 pb-2 last:border-0 last:pb-0"
-                        >
-                          <div className="flex justify-between">
-                            <p className="font-medium">{item.description}</p>
-                            <p>
-                              {item.amount} {item.coin_code}
-                            </p>
-                          </div>
-                          <div className="flex justify-between text-sm text-crypto-text-secondary">
-                            <p>{t("unit_price")}: {item.unit_price}</p>
-                            <p>{t("quantity")}: {item.quantity}</p>
-                          </div>
-                        </div>
-                      ))}
-
-                      {/* Order Total */}
-                      <div className="flex justify-between pt-2 font-medium border-t border-white/20">
-                        <p>Total</p>
+                <div className="p-4 bg-white/5 rounded-xl space-y-3 max-h-60 overflow-y-auto">
+                  {paymentInfo.order.items.map((item, index) => (
+                    <div
+                      key={index}
+                      className="border-b border-white/10 pb-2 last:border-0 last:pb-0"
+                    >
+                      <div className="flex justify-between">
+                        <p className="font-medium">{item.description}</p>
                         <p>
-                          {paymentInfo.order.coinCode}{" "}
-                          {paymentInfo.order.totalAmount}
+                          {item.amount} {item.coin_code}
+                        </p>
+                      </div>
+                      <div className="flex justify-between text-sm text-crypto-text-secondary">
+                        <p>
+                          {t("unit_price")}: {item.unit_price}
+                        </p>
+                        <p>
+                          {t("quantity")}: {item.quantity}
                         </p>
                       </div>
                     </div>
-                  ) : null}
+                  ))}
 
+                  {/* Order Total */}
+                  <div className="flex justify-between pt-2 font-medium border-t border-white/20">
+                    <p>Total</p>
+                    <p>
+                      {paymentInfo.order.coinCode}{" "}
+                      {paymentInfo.order.totalAmount}
+                    </p>
+                  </div>
+                </div>
+              ) : null}
 
               {/* Order Information */}
               <div className="space-y-2">

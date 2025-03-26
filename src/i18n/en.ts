@@ -88,7 +88,7 @@ export const en = {
   loading_camera: "Loading camera...",
   payment_details: "Payment Details",
   payment_id: "Payment ID",
-  amount: "Amount:",
+  amount: "Amount",
   network: "Network",
   address: "Address",
   merchant: "Merchant",

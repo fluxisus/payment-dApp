@@ -214,7 +214,7 @@ const ChargeModal = ({ open, onOpenChange }: ChargeModalProps) => {
               {/* ID and Amount Inputs */}
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="id">{t('payment_id')}:</Label>
+                  <Label htmlFor="id">{t('payment_id')}</Label>
                   <Input
                     id="id"
                     value={formData.id}
@@ -225,7 +225,7 @@ const ChargeModal = ({ open, onOpenChange }: ChargeModalProps) => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="amount">{t('amount')}:</Label>
+                  <Label htmlFor="amount">{t('amount')}</Label>
                   <Input
                     id="amount"
                     type="text"
@@ -237,7 +237,7 @@ const ChargeModal = ({ open, onOpenChange }: ChargeModalProps) => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="address">{t('address')}:</Label>
+                  <Label htmlFor="address">{t('address')}</Label>
                   <div className="px-3 py-2 font-mono text-sm tracking-tight text-foreground">
                     {formData.address}
                   </div>
